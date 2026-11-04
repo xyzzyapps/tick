@@ -1,0 +1,165 @@
+# ======================================================================
+# Learn Tick in Y Minutes
+# Tick is a zero-filler synthesis of Smalltalk's pure message passing
+# and Tcl's command-token structure. Everything is an object, statements
+# end on newlines, expressions nest via [...], and pipelines (|) or 
+# cascades (,) eliminate bracket creep.
+# ======================================================================
+
+# 1. PRIMITIVES & COMMENTS
+# Comments start with a hash (#).
+# Primitives are first-class objects (integer, float, string, boolean):
+10 println                  # => 10
+3.14159 println             # => 3.14159
+true println                # => true
+false println               # => false
+nil println                 # => nil
+
+# 2. VARIABLES & ASSIGNMENT
+# Use 'set <var> <expr>' to bind variables:
+set age 25
+set name "Tick"
+set ratio [age / 5]
+
+# String interpolation supports $var, command [ ... ], and @FFI:
+"Hello $name, ratio is $ratio, version: @VERSION" println
+
+# 3. MESSAGE PASSING (Pure Smalltalk dispatch!)
+# Statements have no dots (.) or semicolons (;). A newline terminates a statement.
+# Message format: Receiver Selector [Arguments]
+
+# Unary messages (no arguments, chained via | to println):
+"hello world" toUpper | println     # => HELLO WORLD
+"hello world" size | println        # => 11
+[42 negated] abs | println          # => 42
+
+# Binary messages (operator + argument):
+set sum [10 + 20]
+set isBigger [sum > 15]
+"Sum: $sum, isBigger: $isBigger" println
+
+# Keyword messages (alternating keyword-argument pairs):
+# In Smalltalk this is #at:put:. In Tick it's just words:
+set myDict [dict new]
+myDict at "language" put "Tick"
+myDict at "author" put "Xyzzy Apps"
+set lang [myDict at "language"]
+"Language: $lang" println
+
+# 4. INLINE EVALUATION WITH BRACKETS [ ... ]
+# Brackets evaluate subexpressions inline and return their result:
+set x [10 + [5 * 2]]
+"x is $x" println                   # => 20
+
+# 5. CODE BLOCKS & CONTROL FLOW
+# Code blocks are enclosed in { ... }. Parameters precede the pipe (|):
+set square { n | n * n }
+set result [square value 8]
+"8 squared: $result" println        # => 64
+
+# Conditionals are messages sent to booleans (#ifTrue:ifFalse:):
+[age >= 18] ifTrue {
+    "Status: Adult" println
+} ifFalse {
+    "Status: Minor" println
+}
+
+# 6. FLUENT PIPELINES (|)
+# The pipe (|) passes the result of the left message send as the
+# receiver of the right message send—eliminating deeply nested brackets:
+set numbers [list new , add 1 , add 2 , add 3 , add 4 , add 5 , add 6]
+
+set processed [
+    numbers select { n | [n % 2] == 0 }
+    | collect { n | n * 10 }
+    | reversed
+    | join " -> "
+]
+"Even numbers reversed: $processed" println
+
+# 7. COMMA CASCADES (,)
+# The comma (,) sends multiple messages sequentially to the SAME receiver:
+# (Like Smalltalk's semicolon ;, reading naturally like an English list)
+set buffer [list new]
+buffer add "Apple",
+       add "Banana",
+       add "Cherry"
+set items [buffer join ", "]
+"Buffer count: [buffer size], items: $items" println
+
+# 8. CLASSES & OBJECT-ORIENTED PROGRAMMING
+# Define classes via 'Object subclass <Name> vars { ivar1 ivar2 }':
+Object subclass BankAccount vars { owner balance }
+
+# Define methods via '<Class> method <signature> { body }':
+BankAccount method owner ownerName balance initialDeposit {
+    set owner ownerName
+    set balance initialDeposit
+}
+
+BankAccount method deposit amount {
+    set balance [balance + amount]
+    "Deposited $amount into $owner's account" println
+    return balance
+}
+
+BankAccount method withdraw amount {
+    [amount <= balance] ifTrue {
+        set balance [balance - amount]
+        return true
+    } ifFalse {
+        "Insufficient funds!" println
+        return false
+    }
+}
+
+BankAccount method getBalance { return balance }
+BankAccount method getOwner { return owner }
+
+# Create and use the object via cascade:
+set account [BankAccount new , owner "Alice" balance 100]
+account deposit 50
+account withdraw 30
+"Final balance for [account getOwner]: $[account getBalance]" println
+
+# 9. RECURSION
+# Methods and blocks can be fully recursive:
+integer method factorial {
+    [self <= 1] ifTrue {
+        return 1
+    } ifFalse {
+        return [self * [[self - 1] factorial]]
+    }
+}
+"6! = [6 factorial]" println        # => 720
+
+# 10. COROUTINES (Stackless Protothreads in C / Channels in Go)
+# Cooperative multitasking with 2-way argument passing:
+set counter [
+    coroutine create { start |
+        set step1 [coroutine yield [start + 1]]
+        set step2 [coroutine yield [step1 + 10]]
+        return [step2 + 100]
+    }
+]
+
+"Coro yield 1: [counter resume 5]" println    # => 6  (5 + 1)
+"Coro yield 2: [counter resume 20]" println   # => 30 (20 + 10)
+"Coro return:  [counter resume 300]" println  # => 400 (300 + 100)
+"Is done:      [counter isDone]" println      # => true
+
+# 11. JSON & SERIALIZATION
+set jsonText "{\"project\":\"Tick\",\"stars\":100,\"embedded\":true}"
+set jsonObj [JSON parse jsonText]
+set proj [jsonObj at "project"]
+"Parsed project: $proj" println
+
+jsonObj at "version" put "1.0.0"
+"Serialized: [JSON stringify jsonObj]" println
+
+# 12. FOREIGN FUNCTION INTERFACE (FFI with @)
+# The @ sigil accesses host functions and host variables:
+"Host OS: @OS, Architecture: @ARCH, Math PI: @PI" println
+@puts "Direct host print from @puts!"
+
+"=== Congratulations! You now know Tick! ===" println

@@ -1369,6 +1369,19 @@ static Obj* m_num_pow(Obj* recv, int argc, Obj** argv, VM* vm) {
     }
     return obj_new_float(res);
 }
+static Obj* m_num_abs(Obj* recv, int argc, Obj** argv, VM* vm) {
+    if (recv->type == OBJ_INT) {
+        int64_t v = recv->as.integer;
+        return obj_new_int(v < 0 ? -v : v);
+    }
+    return obj_new_float(fabs(obj_to_float(recv)));
+}
+static Obj* m_num_negated(Obj* recv, int argc, Obj** argv, VM* vm) {
+    if (recv->type == OBJ_INT) {
+        return obj_new_int(-recv->as.integer);
+    }
+    return obj_new_float(-obj_to_float(recv));
+}
 
 // BlockClosure methods
 static Obj* m_block_value(Obj* recv, int argc, Obj** argv, VM* vm) {
@@ -1442,6 +1455,8 @@ void vm_init_builtins(VM* vm) {
         class_add_native(num_classes[i], "min:", m_num_min);
         class_add_native(num_classes[i], "max:", m_num_max);
         class_add_native(num_classes[i], "pow:", m_num_pow);
+        class_add_native(num_classes[i], "abs", m_num_abs);
+        class_add_native(num_classes[i], "negated", m_num_negated);
     }
 
     // String
