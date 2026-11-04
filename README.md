@@ -228,6 +228,8 @@ gcc -Wall -O2 -Iinclude -Isrc -o tick.exe src/lexer.c src/ast.c src/parser.c src
 
 Tick compiles directly to WebAssembly, enabling in-browser execution with zero installation.
 
+🎮 **Live Playground:** **[https://xyzzyapps.github.io/tick/](https://xyzzyapps.github.io/tick/)**
+
 ### Running the Web Playground Locally
 ```bash
 # Start the built-in HTTP server
