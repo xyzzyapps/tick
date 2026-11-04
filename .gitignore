@@ -1,0 +1,16 @@
+# Compiled binaries
+*.exe
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+
+# IDE and OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Keep web wasm
+!web/tick.wasm
