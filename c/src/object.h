@@ -17,7 +17,6 @@ typedef enum {
     OBJ_INT,
     OBJ_FLOAT,
     OBJ_STRING,
-    OBJ_POINT,
     OBJ_ARRAY,
     OBJ_DICT,
     OBJ_BLOCK,
@@ -79,10 +78,6 @@ struct Obj {
             int length;
         } string;
         struct {
-            Obj* x;
-            Obj* y;
-        } point;
-        struct {
             Obj** items;
             int count;
             int capacity;
@@ -125,7 +120,6 @@ extern Class* NumberClass;
 extern Class* IntegerClass;
 extern Class* FloatClass;
 extern Class* StringClass;
-extern Class* PointClass;
 extern Class* ArrayClass;
 extern Class* DictClass;
 extern Class* BlockClosureClass;
@@ -141,7 +135,6 @@ Obj* obj_new_bool(bool val);
 Obj* obj_new_int(int64_t val);
 Obj* obj_new_float(double val);
 Obj* obj_new_string(const char* s);
-Obj* obj_new_point(Obj* x, Obj* y);
 Obj* obj_new_array(void);
 Obj* obj_new_dict(void);
 Obj* obj_new_block(char** params, int param_count, ASTProgram* body, Scope* scope, int64_t frame_id);

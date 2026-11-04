@@ -61,16 +61,6 @@ func (s StringVal) String() string   { return s.Val }
 func (s StringVal) Class() *Class    { return StringClass }
 func (s StringVal) IsTruthy() bool   { return len(s.Val) > 0 }
 
-type PointVal struct {
-	X Value
-	Y Value
-}
-
-func (p PointVal) Type() string     { return "point" }
-func (p PointVal) String() string   { return fmt.Sprintf("Point(%s, %s)", p.X.String(), p.Y.String()) }
-func (p PointVal) Class() *Class    { return PointClass }
-func (p PointVal) IsTruthy() bool   { return true }
-
 type ArrayVal struct {
 	Elements []Value
 }

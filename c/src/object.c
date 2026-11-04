@@ -14,7 +14,6 @@ Class* NumberClass = NULL;
 Class* IntegerClass = NULL;
 Class* FloatClass = NULL;
 Class* StringClass = NULL;
-Class* PointClass = NULL;
 Class* ArrayClass = NULL;
 Class* DictClass = NULL;
 Class* BlockClosureClass = NULL;
@@ -109,12 +108,6 @@ void obj_system_init(void) {
     IntegerClass = class_new("integer", NumberClass, NULL, 0);
     FloatClass = class_new("Float", NumberClass, NULL, 0);
     StringClass = class_new("String", ObjectClass, NULL, 0);
-
-    char** pt_ivars = (char**)malloc(sizeof(char*) * 2);
-    pt_ivars[0] = strdup("x");
-    pt_ivars[1] = strdup("y");
-    PointClass = class_new("Point", ObjectClass, pt_ivars, 2);
-
     ArrayClass = class_new("Array", ObjectClass, NULL, 0);
     DictClass = class_new("Dictionary", ObjectClass, NULL, 0);
     BlockClosureClass = class_new("BlockClosure", ObjectClass, NULL, 0);
@@ -161,15 +154,6 @@ Obj* obj_new_string(const char* s) {
     o->klass = StringClass;
     o->as.string.chars = strdup(s ? s : "");
     o->as.string.length = (int)strlen(o->as.string.chars);
-    return o;
-}
-
-Obj* obj_new_point(Obj* x, Obj* y) {
-    Obj* o = (Obj*)malloc(sizeof(Obj));
-    o->type = OBJ_POINT;
-    o->klass = PointClass;
-    o->as.point.x = x;
-    o->as.point.y = y;
     return o;
 }
 
@@ -275,16 +259,6 @@ char* obj_to_string(Obj* o) {
             return strdup(buf);
         case OBJ_STRING:
             return strdup(o->as.string.chars);
-        case OBJ_POINT: {
-            char* xs = obj_to_string(o->as.point.x);
-            char* ys = obj_to_string(o->as.point.y);
-            int len = (int)strlen(xs) + (int)strlen(ys) + 12;
-            char* res = (char*)malloc(len);
-            sprintf(res, "Point(%s, %s)", xs, ys);
-            free(xs);
-            free(ys);
-            return res;
-        }
         case OBJ_ARRAY: {
             int cap = 64;
             char* res = (char*)malloc(cap);
@@ -362,7 +336,6 @@ bool obj_equals(Obj* a, Obj* b) {
         case OBJ_INT: return a->as.integer == b->as.integer;
         case OBJ_FLOAT: return a->as.number == b->as.number;
         case OBJ_STRING: return strcmp(a->as.string.chars, b->as.string.chars) == 0;
-        case OBJ_POINT: return obj_equals(a->as.point.x, b->as.point.x) && obj_equals(a->as.point.y, b->as.point.y);
         default: return a == b;
     }
 }

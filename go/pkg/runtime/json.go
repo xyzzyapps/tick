@@ -85,11 +85,6 @@ func convertValueToJSON(v Value) interface{} {
 		return val.Val
 	case StringVal:
 		return val.Val
-	case PointVal:
-		return map[string]interface{}{
-			"x": convertValueToJSON(val.X),
-			"y": convertValueToJSON(val.Y),
-		}
 	case *ArrayVal:
 		arr := make([]interface{}, len(val.Elements))
 		for i, el := range val.Elements {

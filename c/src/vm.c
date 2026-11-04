@@ -154,8 +154,6 @@ VM* vm_new(void) {
     scope_set(vm->globals, "float", obj_new_class(FloatClass));
     scope_set(vm->globals, "String", obj_new_class(StringClass));
     scope_set(vm->globals, "string", obj_new_class(StringClass));
-    scope_set(vm->globals, "Point", obj_new_class(PointClass));
-    scope_set(vm->globals, "point", obj_new_class(PointClass));
     scope_set(vm->globals, "Array", obj_new_class(ArrayClass));
     scope_set(vm->globals, "array", obj_new_class(ArrayClass));
     scope_set(vm->globals, "List", obj_new_class(ArrayClass));
@@ -347,10 +345,6 @@ static VMResult eval_expr(VM* vm, ASTExpr* expr, Scope* scope) {
                 }
                 if (strcmp(expr->as.ident, "JSON") == 0 || strcmp(expr->as.ident, "json") == 0) {
                     res.value = obj_new_class(JSONClass);
-                    return res;
-                }
-                if (strcmp(expr->as.ident, "Point") == 0 || strcmp(expr->as.ident, "point") == 0) {
-                    res.value = obj_new_class(PointClass);
                     return res;
                 }
                 if (strcmp(expr->as.ident, "Object") == 0 || strcmp(expr->as.ident, "object") == 0) {
@@ -848,7 +842,6 @@ static Obj* m_class_new(Obj* recv, int argc, Obj** argv, VM* vm) {
     Class* c = (recv->type == OBJ_CLASS) ? recv->as.class_val : recv->klass;
     if (c == ArrayClass) return obj_new_array();
     if (c == DictClass) return obj_new_dict();
-    if (c == PointClass) return obj_new_point(obj_new_int(0), obj_new_int(0));
     return obj_new_instance(c);
 }
 
@@ -991,27 +984,6 @@ static Obj* m_num_lte(Obj* recv, int argc, Obj** argv, VM* vm) {
 static Obj* m_num_gte(Obj* recv, int argc, Obj** argv, VM* vm) {
     if (argc < 1) return obj_new_bool(false);
     return obj_new_bool(obj_to_float(recv) >= obj_to_float(argv[0]));
-}
-static Obj* m_point_create(Obj* recv, int argc, Obj** argv, VM* vm) {
-    Obj* x = (argc > 0) ? argv[0] : obj_new_int(0);
-    Obj* y = (argc > 1) ? argv[1] : obj_new_int(0);
-    return obj_new_point(x, y);
-}
-
-// Point methods
-static Obj* m_point_x(Obj* recv, int argc, Obj** argv, VM* vm) {
-    if (recv->type != OBJ_POINT) return obj_new_nil();
-    return recv->as.point.x;
-}
-static Obj* m_point_y(Obj* recv, int argc, Obj** argv, VM* vm) {
-    if (recv->type != OBJ_POINT) return obj_new_nil();
-    return recv->as.point.y;
-}
-static Obj* m_point_add(Obj* recv, int argc, Obj** argv, VM* vm) {
-    if (argc < 1 || recv->type != OBJ_POINT || argv[0]->type != OBJ_POINT) return obj_new_nil();
-    VMResult rx = vm_send_message(vm, recv->as.point.x, "+", 1, &argv[0]->as.point.x);
-    VMResult ry = vm_send_message(vm, recv->as.point.y, "+", 1, &argv[0]->as.point.y);
-    return obj_new_point(rx.value, ry.value);
 }
 
 // Dict methods
@@ -1511,13 +1483,6 @@ void vm_init_builtins(VM* vm) {
     class_add_native(ArrayClass, "indexOf:", m_arr_index_of);
     class_add_native(ArrayClass, "reverse", m_arr_reverse);
     class_add_native(ArrayClass, "reversed", m_arr_reverse);
-
-    // Point
-    class_add_native(PointClass, "x:y:", m_point_create);
-    class_add_native(MetaclassClass, "x:y:", m_point_create);
-    class_add_native(PointClass, "x", m_point_x);
-    class_add_native(PointClass, "y", m_point_y);
-    class_add_native(PointClass, "+", m_point_add);
 
     // Dictionary
     class_add_native(DictClass, "at:", m_dict_at);

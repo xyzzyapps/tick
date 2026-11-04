@@ -87,9 +87,6 @@ func InitBuiltinMethods(vm *VM) {
 		if classVal.Klass == DictClass {
 			return &DictVal{Entries: make(map[string]Value)}, nil
 		}
-		if classVal.Klass == PointClass {
-			return PointVal{X: IntVal{Val: 0}, Y: IntVal{Val: 0}}, nil
-		}
 		return classVal.Klass.NewInstance(), nil
 	})
 	MetaclassClass.AddNativeMethod("subclass:", func(recv Value, args []Value, v *VM) (Value, error) {
@@ -188,44 +185,6 @@ func InitBuiltinMethods(vm *VM) {
 	addArithmeticMethods(IntegerClass)
 	addArithmeticMethods(FloatClass)
 	addArithmeticMethods(NumberClass)
-
-	// ================= Point =================
-	pointXYFn := func(recv Value, args []Value, v *VM) (Value, error) {
-		if err := CheckArgCount("x:y:", args, 2); err != nil {
-			return nil, err
-		}
-		return PointVal{X: args[0], Y: args[1]}, nil
-	}
-	PointClass.AddNativeMethod("x:y:", pointXYFn)
-	MetaclassClass.AddNativeMethod("x:y:", pointXYFn)
-
-	PointClass.AddNativeMethod("x", func(recv Value, args []Value, v *VM) (Value, error) {
-		pt := recv.(PointVal)
-		return pt.X, nil
-	})
-	PointClass.AddNativeMethod("y", func(recv Value, args []Value, v *VM) (Value, error) {
-		pt := recv.(PointVal)
-		return pt.Y, nil
-	})
-	PointClass.AddNativeMethod("+", func(recv Value, args []Value, v *VM) (Value, error) {
-		if err := CheckArgCount("+", args, 1); err != nil {
-			return nil, err
-		}
-		pt := recv.(PointVal)
-		otherPt, ok := args[0].(PointVal)
-		if !ok {
-			return nil, fmt.Errorf("argument to Point + must be Point")
-		}
-		newX, err := v.SendMessage(pt.X, "+", []Value{otherPt.X})
-		if err != nil {
-			return nil, err
-		}
-		newY, err := v.SendMessage(pt.Y, "+", []Value{otherPt.Y})
-		if err != nil {
-			return nil, err
-		}
-		return PointVal{X: newX, Y: newY}, nil
-	})
 
 	// ================= String =================
 	StringClass.AddNativeMethod("size", func(recv Value, args []Value, v *VM) (Value, error) {
@@ -951,9 +910,6 @@ func ValuesEqual(a, b Value) bool {
 	case StringVal:
 		vb, ok := b.(StringVal)
 		return ok && va.Val == vb.Val
-	case PointVal:
-		vb, ok := b.(PointVal)
-		return ok && ValuesEqual(va.X, vb.X) && ValuesEqual(va.Y, vb.Y)
 	default:
 		return a == b
 	}

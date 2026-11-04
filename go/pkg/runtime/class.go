@@ -107,7 +107,6 @@ var (
 	IntegerClass         *Class
 	FloatClass           *Class
 	StringClass          *Class
-	PointClass           *Class
 	ArrayClass           *Class
 	DictClass            *Class
 	BlockClosureClass    *Class
@@ -125,7 +124,6 @@ func init() {
 	IntegerClass = NewClass("integer", NumberClass, nil)
 	FloatClass = NewClass("Float", NumberClass, nil)
 	StringClass = NewClass("String", ObjectClass, nil)
-	PointClass = NewClass("Point", ObjectClass, []string{"x", "y"})
 	ArrayClass = NewClass("Array", ObjectClass, nil)
 	DictClass = NewClass("Dictionary", ObjectClass, nil)
 	BlockClosureClass = NewClass("BlockClosure", ObjectClass, nil)

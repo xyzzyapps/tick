@@ -52,8 +52,6 @@ func NewVM() *VM {
 	globals.Set("float", FloatClass.AsValue())
 	globals.Set("String", StringClass.AsValue())
 	globals.Set("string", StringClass.AsValue())
-	globals.Set("Point", PointClass.AsValue())
-	globals.Set("point", PointClass.AsValue())
 	globals.Set("Array", ArrayClass.AsValue())
 	globals.Set("array", ArrayClass.AsValue())
 	globals.Set("List", ArrayClass.AsValue())

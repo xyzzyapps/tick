@@ -23,7 +23,7 @@ Both implementations support the full language grammar, pure Smalltalk message p
 
 4. **Fluent Pipelines (`|`) & Comma Cascades (`,`)**:
    - **Pipe (`|`)**: Chains the return value of the left message as the receiver of the right message (Ruby-style fluent chaining without bracket creep).
-   - **Comma (`,`)**: Sends the next message to the original receiver, reading like a natural English list of actions on a single subject (`pen up, goto [Point x 0 y 0], down`).
+   - **Comma (`,`)**: Sends the next message to the original receiver, reading like a natural English list of actions on a single subject (`logger info "Started", record "count" value 1, flush`).
 
 5. **Special Forms & Interpolation**:
    - `set var value`: Handles variable and instance variable assignment (`:=`).
@@ -64,7 +64,7 @@ Both implementations support the full language grammar, pure Smalltalk message p
 | **Zero-Arg Block** | `[ self alert ]` | `{ self alert }` |
 | **Parameterized Block** | `[ :x :y \| x + y ]` | `{ x y \| x + y }` |
 | **Fluent Pipeline** | `((items select: [:x \| x valid]) collect: [:x \| x name]) sorted.` | `items select { x \| x valid } \| collect { x \| x name } \| sorted` |
-| **Message Cascade** | `pen up; goto: origin; down.` | `pen up, goto [Point x 0 y 0], down` |
+| **Message Cascade** | `pen up; color: "blue"; down.` | `pen up, color "blue", down` |
 
 ---
 
