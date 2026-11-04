@@ -511,13 +511,10 @@ integer method fact {
 "7! = [7 fact]" println
 "10! = [10 fact]" println
 
-# 2D Point
-set p1 [Point x 10 y 20]
-set p2 [Point x 30 y 40]
-set p3 [p1 + p2]
-"Point 1: $p1" println
-"Point 2: $p2" println
-"Sum:     $p3 (x=[p3 x], y=[p3 y])" println
+# Math methods on numbers
+"2^8: [2 pow 8]" println
+"min(15, 42): [15 min 42]" println
+"max(15, 42): [15 max 42]" println
 `,
             web: `# Tick Web FFI: Calling the Browser Environment
 @log "Hello from Tick running in WebAssembly!"
