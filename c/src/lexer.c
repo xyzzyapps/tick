@@ -227,7 +227,7 @@ TokenList lexer_tokenize(const char* source) {
             continue;
         }
 
-        // @ Sigil (FFI or Point Binary Op)
+        // @ Sigil (strictly FFI)
         if (ch == '@') {
             pos++; col++;
             if (pos < len && is_ident_start(source[pos])) {
@@ -243,7 +243,7 @@ TokenList lexer_tokenize(const char* source) {
                 token_list_add(&raw, TOK_SIGIL_FFI, ffi_str, start_line, start_col);
                 free(ffi_str);
             } else {
-                token_list_add(&raw, TOK_BINARY_OP, "@", start_line, start_col);
+                fprintf(stderr, "Lexer error at line %d, col %d: '@' is reserved for FFI identifiers\n", start_line, start_col);
             }
             continue;
         }

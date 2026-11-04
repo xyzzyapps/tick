@@ -14,7 +14,7 @@ Both implementations support the full language grammar, pure Smalltalk message p
 
 1. **Command-Line Statements**: A newline terminates a statement (replacing Smalltalk’s `.`). The first token is always the **Receiver**, followed by:
    - A **Unary Selector**: `window close`
-   - A **Binary Selector**: `a + b`, `0@0`
+   - A **Binary Selector**: `a + b`, `x * y`
    - Alternating **Keyword-Argument pairs**: `dict at "a" put 1` (compiles directly to `#at:put:`)
 
 2. **Inline Evaluation `[ ... ]`**: Borrowed from Tcl command substitution, brackets evaluate nested expressions inline and return their result (replacing Smalltalk’s parentheses `(...)`).
@@ -23,7 +23,7 @@ Both implementations support the full language grammar, pure Smalltalk message p
 
 4. **Fluent Pipelines (`|`) & Comma Cascades (`,`)**:
    - **Pipe (`|`)**: Chains the return value of the left message as the receiver of the right message (Ruby-style fluent chaining without bracket creep).
-   - **Comma (`,`)**: Sends the next message to the original receiver, reading like a natural English list of actions on a single subject (`pen up, goto 0@0, down`).
+   - **Comma (`,`)**: Sends the next message to the original receiver, reading like a natural English list of actions on a single subject (`pen up, goto [Point x 0 y 0], down`).
 
 5. **Special Forms & Interpolation**:
    - `set var value`: Handles variable and instance variable assignment (`:=`).
@@ -64,7 +64,7 @@ Both implementations support the full language grammar, pure Smalltalk message p
 | **Zero-Arg Block** | `[ self alert ]` | `{ self alert }` |
 | **Parameterized Block** | `[ :x :y \| x + y ]` | `{ x y \| x + y }` |
 | **Fluent Pipeline** | `((items select: [:x \| x valid]) collect: [:x \| x name]) sorted.` | `items select { x \| x valid } \| collect { x \| x name } \| sorted` |
-| **Message Cascade** | `pen up; goto: 0@0; down.` | `pen up, goto 0@0, down` |
+| **Message Cascade** | `pen up; goto: origin; down.` | `pen up, goto [Point x 0 y 0], down` |
 
 ---
 

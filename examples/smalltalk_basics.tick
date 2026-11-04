@@ -1,8 +1,8 @@
 # Smalltalk & Tcl-Talk basics test suite
 
 @puts "--- Testing Points ---"
-set pt1 10@20
-set pt2 5@5
+set pt1 [Point x 10 y 20]
+set pt2 [Point x 5 y 5]
 set pt3 [pt1 + pt2]
 @puts "Point: $pt3"
 @puts "pt3 x: [pt3 x], y: [pt3 y]"

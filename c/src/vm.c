@@ -848,6 +848,7 @@ static Obj* m_class_new(Obj* recv, int argc, Obj** argv, VM* vm) {
     Class* c = (recv->type == OBJ_CLASS) ? recv->as.class_val : recv->klass;
     if (c == ArrayClass) return obj_new_array();
     if (c == DictClass) return obj_new_dict();
+    if (c == PointClass) return obj_new_point(obj_new_int(0), obj_new_int(0));
     return obj_new_instance(c);
 }
 
@@ -991,9 +992,10 @@ static Obj* m_num_gte(Obj* recv, int argc, Obj** argv, VM* vm) {
     if (argc < 1) return obj_new_bool(false);
     return obj_new_bool(obj_to_float(recv) >= obj_to_float(argv[0]));
 }
-static Obj* m_num_at(Obj* recv, int argc, Obj** argv, VM* vm) {
-    if (argc < 1) return recv;
-    return obj_new_point(recv, argv[0]);
+static Obj* m_point_create(Obj* recv, int argc, Obj** argv, VM* vm) {
+    Obj* x = (argc > 0) ? argv[0] : obj_new_int(0);
+    Obj* y = (argc > 1) ? argv[1] : obj_new_int(0);
+    return obj_new_point(x, y);
 }
 
 // Point methods
@@ -1459,7 +1461,6 @@ void vm_init_builtins(VM* vm) {
         class_add_native(num_classes[i], ">", m_num_gt);
         class_add_native(num_classes[i], "<=", m_num_lte);
         class_add_native(num_classes[i], ">=", m_num_gte);
-        class_add_native(num_classes[i], "@", m_num_at);
         class_add_native(num_classes[i], "asFloat", m_num_as_float);
         class_add_native(num_classes[i], "asInteger", m_num_as_integer);
         class_add_native(num_classes[i], "asInt", m_num_as_integer);
@@ -1512,6 +1513,8 @@ void vm_init_builtins(VM* vm) {
     class_add_native(ArrayClass, "reversed", m_arr_reverse);
 
     // Point
+    class_add_native(PointClass, "x:y:", m_point_create);
+    class_add_native(MetaclassClass, "x:y:", m_point_create);
     class_add_native(PointClass, "x", m_point_x);
     class_add_native(PointClass, "y", m_point_y);
     class_add_native(PointClass, "+", m_point_add);

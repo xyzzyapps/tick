@@ -87,6 +87,9 @@ func InitBuiltinMethods(vm *VM) {
 		if classVal.Klass == DictClass {
 			return &DictVal{Entries: make(map[string]Value)}, nil
 		}
+		if classVal.Klass == PointClass {
+			return PointVal{X: IntVal{Val: 0}, Y: IntVal{Val: 0}}, nil
+		}
 		return classVal.Klass.NewInstance(), nil
 	})
 	MetaclassClass.AddNativeMethod("subclass:", func(recv Value, args []Value, v *VM) (Value, error) {
@@ -187,6 +190,15 @@ func InitBuiltinMethods(vm *VM) {
 	addArithmeticMethods(NumberClass)
 
 	// ================= Point =================
+	pointXYFn := func(recv Value, args []Value, v *VM) (Value, error) {
+		if err := CheckArgCount("x:y:", args, 2); err != nil {
+			return nil, err
+		}
+		return PointVal{X: args[0], Y: args[1]}, nil
+	}
+	PointClass.AddNativeMethod("x:y:", pointXYFn)
+	MetaclassClass.AddNativeMethod("x:y:", pointXYFn)
+
 	PointClass.AddNativeMethod("x", func(recv Value, args []Value, v *VM) (Value, error) {
 		pt := recv.(PointVal)
 		return pt.X, nil
@@ -788,12 +800,6 @@ func addArithmeticMethods(c *Class) {
 			return nil, err
 		}
 		return BoolVal{Val: toFloat(recv) >= toFloat(args[0])}, nil
-	})
-	c.AddNativeMethod("@", func(recv Value, args []Value, v *VM) (Value, error) {
-		if err := CheckArgCount("@", args, 1); err != nil {
-			return nil, err
-		}
-		return PointVal{X: recv, Y: args[0]}, nil
 	})
 	c.AddNativeMethod("abs", func(recv Value, args []Value, v *VM) (Value, error) {
 		if isInt(recv) {

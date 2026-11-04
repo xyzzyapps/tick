@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 )
@@ -110,7 +111,7 @@ func (l *Lexer) Tokenize() ([]Token, error) {
 			})
 
 		case '@':
-			// Check if FFI sigil (@func or @lib:func) or binary op (@ for Point 0@0)
+			// @ is exclusively the FFI sigil (@func, @VAR, or @lib:func)
 			if isIdentStart(l.peek()) {
 				ident := l.readIdentifier()
 				lexeme := "@" + ident
@@ -121,12 +122,7 @@ func (l *Lexer) Tokenize() ([]Token, error) {
 					Column: startCol,
 				})
 			} else {
-				rawTokens = append(rawTokens, Token{
-					Type:   TOKEN_BINARY_OP,
-					Lexeme: "@",
-					Line:   startLine,
-					Column: startCol,
-				})
+				return nil, fmt.Errorf("unexpected '@' at line %d, col %d: '@' is reserved for FFI identifiers", startLine, startCol)
 			}
 
 		default:

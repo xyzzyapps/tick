@@ -67,7 +67,7 @@ type PointVal struct {
 }
 
 func (p PointVal) Type() string     { return "point" }
-func (p PointVal) String() string   { return fmt.Sprintf("%s@%s", p.X.String(), p.Y.String()) }
+func (p PointVal) String() string   { return fmt.Sprintf("Point(%s, %s)", p.X.String(), p.Y.String()) }
 func (p PointVal) Class() *Class    { return PointClass }
 func (p PointVal) IsTruthy() bool   { return true }
 

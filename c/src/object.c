@@ -278,9 +278,9 @@ char* obj_to_string(Obj* o) {
         case OBJ_POINT: {
             char* xs = obj_to_string(o->as.point.x);
             char* ys = obj_to_string(o->as.point.y);
-            int len = (int)strlen(xs) + (int)strlen(ys) + 2;
+            int len = (int)strlen(xs) + (int)strlen(ys) + 12;
             char* res = (char*)malloc(len);
-            sprintf(res, "%s@%s", xs, ys);
+            sprintf(res, "Point(%s, %s)", xs, ys);
             free(xs);
             free(ys);
             return res;
