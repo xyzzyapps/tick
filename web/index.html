@@ -3,26 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tick WebAssembly Playground</title>
+    <title>Tick Programming Language — A Programmer's Best Friend</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
     <script src="wasm_exec.js"></script>
     <style>
         :root {
-            --bg-base: #0f1117;
-            --bg-panel: #161822;
-            --bg-header: #12141c;
-            --border-color: #262938;
-            --accent-primary: #3b82f6;
-            --accent-hover: #2563eb;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-purple: #8b5cf6;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-code: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+            /* Ruby-inspired palette */
+            --ruby-red: #cc342d;
+            --ruby-red-hover: #b02620;
+            --ruby-dark: #82151a;
+            --ruby-deep-bg: #1c080a;
+            --ruby-accent: #e54d42;
+            --ruby-gold: #d97706;
+            --ruby-cream: #faf9f7;
+            --ruby-card-bg: #ffffff;
+            --ruby-border: #e6dfdc;
+            --ruby-text-title: #1a1615;
+            --ruby-text-body: #3c3532;
+            --ruby-text-muted: #736863;
+            
+            /* Dark code & terminal colors */
+            --code-bg: #1a171d;
+            --code-header: #141217;
+            --code-border: #2a2530;
+            --code-text: #f3f0f5;
+            --term-stdout: #e5e0ea;
+            --term-result: #34d399;
+            --term-error: #f87171;
+            
+            --font-serif: 'Merriweather', Georgia, serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
         }
 
         * {
@@ -32,21 +45,29 @@
         }
 
         body {
-            font-family: var(--font-ui);
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: var(--font-sans);
+            background-color: var(--ruby-cream);
+            color: var(--ruby-text-body);
+            line-height: 1.6;
         }
 
-        header {
-            background-color: var(--bg-header);
-            border-bottom: 1px solid var(--border-color);
+        /* Top Navigation Header */
+        header.site-header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #f0eae7;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 12px 24px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             flex-wrap: wrap;
             gap: 12px;
         }
@@ -55,101 +76,259 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            text-decoration: none;
         }
 
-        .brand-logo {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        .brand-gem {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--ruby-red), var(--ruby-dark));
             color: white;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(204, 52, 45, 0.3);
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-family: var(--font-serif);
+            font-size: 1.35rem;
             font-weight: 700;
-            font-size: 1.1rem;
-            padding: 6px 12px;
-            border-radius: 6px;
-            letter-spacing: 0.5px;
+            color: var(--ruby-red);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
         }
 
-        .brand-title {
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: #fff;
+        .brand-tagline {
+            font-size: 0.75rem;
+            color: var(--ruby-text-muted);
+            font-weight: 500;
         }
 
-        .brand-subtitle {
-            font-size: 0.8rem;
-            color: var(--text-muted);
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            list-style: none;
         }
 
-        .badge {
+        .nav-links a {
+            color: var(--ruby-text-body);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--ruby-red);
+        }
+
+        .nav-badge {
             font-size: 0.72rem;
             padding: 3px 8px;
             border-radius: 4px;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .badge-polyform {
-            background-color: #2e1065;
-            color: #c084fc;
-            border: 1px solid #581c87;
-        }
-
-        .badge-status {
-            background-color: #1e293b;
-            color: #94a3b8;
-            border: 1px solid #334155;
+            font-weight: 600;
+            background-color: #fdf2f2;
+            color: var(--ruby-red);
+            border: 1px solid #fecaca;
         }
 
         .badge-ready {
-            background-color: #064e3b;
-            color: #34d399;
-            border: 1px solid #059669;
+            background-color: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
         }
 
-        .toolbar {
+        /* Hero Section */
+        section.hero {
+            background: linear-gradient(180deg, #ffffff 0%, #faf6f4 100%);
+            border-bottom: 1px solid var(--ruby-border);
+            padding: 60px 24px 50px;
+            text-align: center;
+        }
+
+        .hero-inner {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 2.7rem;
+            font-weight: 700;
+            color: var(--ruby-text-title);
+            line-height: 1.2;
+            margin-bottom: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero h1 span.highlight {
+            color: var(--ruby-red);
+        }
+
+        .hero p.lead {
+            font-size: 1.18rem;
+            color: var(--ruby-text-body);
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        .hero p.sublead {
+            font-size: 0.95rem;
+            color: var(--ruby-text-muted);
+            margin-bottom: 32px;
+            max-width: 760px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: none;
+        }
+
+        .btn-ruby {
+            background-color: var(--ruby-red);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(204, 52, 45, 0.25);
+        }
+
+        .btn-ruby:hover {
+            background-color: var(--ruby-red-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #ffffff;
+            color: var(--ruby-text-title);
+            border: 1px solid var(--ruby-border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f7f3f1;
+            border-color: #d1c7c2;
+        }
+
+        /* Playground Container */
+        section.playground-section {
+            max-width: 1200px;
+            margin: 40px auto 60px;
+            padding: 0 24px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            color: var(--ruby-text-title);
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--ruby-text-muted);
+            font-size: 0.95rem;
+        }
+
+        .playground-card {
+            background-color: var(--code-bg);
+            border-radius: 10px;
+            border: 1px solid var(--code-border);
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .playground-toolbar {
+            background-color: var(--code-header);
+            border-bottom: 1px solid var(--code-border);
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .toolbar-left, .toolbar-right {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        select {
-            background-color: #1e2230;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
+        .window-dots {
+            display: flex;
+            gap: 6px;
+            margin-right: 8px;
+        }
+
+        .window-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background-color: #ef4444; }
+        .dot-yellow { background-color: #f59e0b; }
+        .dot-green { background-color: #10b981; }
+
+        .playground-select {
+            background-color: #26222b;
+            color: #f3f0f5;
+            border: 1px solid #3c3445;
             border-radius: 6px;
-            padding: 8px 12px;
+            padding: 6px 12px;
             font-size: 0.85rem;
-            font-family: var(--font-ui);
+            font-family: var(--font-sans);
             cursor: pointer;
             outline: none;
         }
 
-        select:focus {
-            border-color: var(--accent-primary);
-        }
-
-        button {
-            border: none;
-            border-radius: 6px;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            font-family: var(--font-ui);
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.15s ease;
+        .playground-select:focus {
+            border-color: var(--ruby-red);
         }
 
         .btn-run {
-            background-color: var(--accent-primary);
-            color: white;
+            background-color: var(--ruby-red);
+            color: #ffffff;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
         }
 
         .btn-run:hover:not(:disabled) {
-            background-color: var(--accent-hover);
+            background-color: var(--ruby-red-hover);
         }
 
         .btn-run:disabled {
@@ -157,70 +336,67 @@
             cursor: not-allowed;
         }
 
-        .btn-secondary {
-            background-color: #1e2230;
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
+        .btn-tool {
+            background-color: #26222b;
+            color: #a79fae;
+            border: 1px solid #3c3445;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
         }
 
-        .btn-secondary:hover {
-            background-color: #282d3f;
-            color: var(--text-main);
+        .btn-tool:hover {
+            background-color: #332d3b;
+            color: #f3f0f5;
         }
 
-        .main-container {
-            flex: 1;
+        .playground-body {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            min-height: 480px;
+            max-height: 600px;
             gap: 1px;
-            background-color: var(--border-color);
-            overflow: hidden;
+            background-color: var(--code-border);
         }
 
         @media (max-width: 900px) {
-            .main-container {
+            .playground-body {
                 grid-template-columns: 1fr;
                 grid-template-rows: 1fr 1fr;
             }
         }
 
-        .pane {
-            background-color: var(--bg-panel);
+        .editor-pane, .terminal-pane {
             display: flex;
             flex-direction: column;
+            background-color: var(--code-bg);
             overflow: hidden;
         }
 
-        .pane-header {
-            background-color: var(--bg-header);
-            padding: 10px 16px;
-            font-size: 0.8rem;
+        .pane-label {
+            background-color: #151318;
+            padding: 6px 14px;
+            font-size: 0.75rem;
             font-weight: 600;
+            color: #8c8294;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--code-border);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .pane-body {
-            flex: 1;
-            position: relative;
-            display: flex;
-            overflow: hidden;
         }
 
         #code-editor {
+            flex: 1;
             width: 100%;
-            height: 100%;
             padding: 16px;
-            background-color: #11131a;
-            color: #e5e7eb;
-            font-family: var(--font-code);
-            font-size: 0.95rem;
-            line-height: 1.5;
+            background-color: #17151c;
+            color: var(--code-text);
+            font-family: var(--font-mono);
+            font-size: 0.92rem;
+            line-height: 1.55;
             border: none;
             resize: none;
             outline: none;
@@ -230,144 +406,500 @@
         }
 
         #terminal {
+            flex: 1;
             width: 100%;
-            height: 100%;
             padding: 16px;
-            background-color: #0d0f14;
-            color: #d1d5db;
-            font-family: var(--font-code);
-            font-size: 0.9rem;
+            background-color: #121015;
+            color: var(--term-stdout);
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
             line-height: 1.6;
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-word;
         }
 
-        .term-stdout {
-            color: #e2e8f0;
-        }
-
-        .term-result {
-            color: #34d399;
-            font-weight: 500;
-        }
-
+        .term-stdout { color: #e2dce8; }
+        .term-result { color: var(--term-result); font-weight: 600; }
         .term-error {
-            color: #f87171;
+            color: var(--term-error);
             background-color: rgba(239, 68, 68, 0.1);
             padding: 4px 8px;
             border-radius: 4px;
             margin: 4px 0;
             display: inline-block;
         }
+        .term-info { color: #7f748b; font-size: 0.82rem; margin: 4px 0; }
 
-        .term-info {
-            color: #64748b;
-            font-size: 0.8rem;
-            margin: 6px 0;
-        }
-
-        footer {
-            background-color: var(--bg-header);
-            border-top: 1px solid var(--border-color);
-            padding: 10px 24px;
+        .playground-footer {
+            background-color: var(--code-header);
+            border-top: 1px solid var(--code-border);
+            padding: 8px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        footer a {
-            color: #60a5fa;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        .footer-shortcuts {
-            display: flex;
-            gap: 16px;
+            font-size: 0.75rem;
+            color: #8c8294;
         }
 
         .kbd {
-            background-color: #1e2230;
-            border: 1px solid #334155;
-            padding: 2px 5px;
+            background-color: #26222b;
+            border: 1px solid #3c3445;
+            padding: 1px 5px;
             border-radius: 3px;
-            color: #cbd5e1;
-            font-family: var(--font-code);
-            font-size: 0.72rem;
+            color: #d4cedb;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+        }
+
+        /* Features Section (Ruby-lang cards) */
+        section.features-section {
+            background-color: #ffffff;
+            border-top: 1px solid var(--ruby-border);
+            border-bottom: 1px solid var(--ruby-border);
+            padding: 60px 24px;
+        }
+
+        .features-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 28px;
+            margin-top: 36px;
+        }
+
+        .feature-card {
+            background-color: var(--ruby-cream);
+            border: 1px solid var(--ruby-border);
+            border-radius: 8px;
+            padding: 24px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+            border-color: #d1c7c2;
+        }
+
+        .feature-icon {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            color: var(--ruby-text-title);
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 0.92rem;
+            color: var(--ruby-text-body);
+            line-height: 1.55;
+        }
+
+        /* Comparison Section */
+        section.comparison-section {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 24px;
+        }
+
+        .table-wrapper {
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid var(--ruby-border);
+            overflow-x: auto;
+            margin-top: 28px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+
+        table.comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        table.comparison-table th {
+            background-color: #faf6f4;
+            color: var(--ruby-text-title);
+            font-family: var(--font-serif);
+            font-weight: 700;
+            padding: 12px 18px;
+            border-bottom: 2px solid var(--ruby-border);
+        }
+
+        table.comparison-table td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--ruby-border);
+        }
+
+        table.comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        table.comparison-table code {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            background-color: #f5f2f0;
+            color: #a82025;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Site Footer */
+        footer.site-footer {
+            background-color: var(--ruby-deep-bg);
+            color: #d1c4c6;
+            padding: 50px 24px 30px;
+            border-top: 3px solid var(--ruby-red);
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 36px;
+        }
+
+        @media (max-width: 768px) {
+            .footer-inner {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+        }
+
+        .footer-col h4 {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            color: #ffffff;
+            margin-bottom: 14px;
+        }
+
+        .footer-col p {
+            font-size: 0.88rem;
+            color: #a89aa0;
+            line-height: 1.6;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-col ul li a {
+            color: #e5d8db;
+            text-decoration: none;
+            font-size: 0.88rem;
+            transition: color 0.15s ease;
+        }
+
+        .footer-col ul li a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid #35171b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: #8c7e84;
+        }
+
+        .footer-bottom a {
+            color: #e58d92;
+            text-decoration: none;
+        }
+
+        .footer-bottom a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand-area">
-            <div class="brand-logo">TICK</div>
-            <div>
-                <div class="brand-title">Tick Web Playground</div>
-                <div class="brand-subtitle">Smalltalk Messages • Tcl Tokens • Protothreads Coroutines</div>
-            </div>
-            <span id="wasm-status" class="badge badge-status">⚡ Initializing WASM...</span>
-            <span class="badge badge-polyform">PolyForm Noncommercial 1.0.0</span>
-        </div>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="#" class="brand-area">
+                <div class="brand-gem">💎</div>
+                <div class="brand-text">
+                    <span class="brand-name">Tick</span>
+                    <span class="brand-tagline">A Programmer's Best Friend</span>
+                </div>
+            </a>
 
-        <div class="toolbar">
-            <select id="example-select">
-                <option value="learn" selected>⭐ Learn Tick in Y Minutes (Full Tour)</option>
-                <option value="showcase">1. Orders Showcase (Pipes & Cascades)</option>
-                <option value="coroutine">2. Coroutine Generator (Fibonacci)</option>
-                <option value="twoway">3. 2-Way Communicating Coroutine</option>
-                <option value="json">4. JSON & Data Collections</option>
-                <option value="recursion">5. Recursion & Math</option>
-                <option value="web">6. Web FFI (@alert & @log)</option>
-            </select>
-            <button id="btn-run" class="btn-run" disabled>▶ Run</button>
-            <button id="btn-clear" class="btn-secondary">Clear Output</button>
-            <button id="btn-reset" class="btn-secondary">Reset VM</button>
+            <ul class="nav-links">
+                <li><a href="#playground">Playground</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#comparison">Smalltalk vs Tick</a></li>
+                <li><a href="https://github.com/xyzzyapps/tick" target="_blank">GitHub ↗</a></li>
+                <li><span id="wasm-status" class="nav-badge">⚡ Loading WASM...</span></li>
+            </ul>
         </div>
     </header>
 
-    <div class="main-container">
-        <!-- Editor Pane -->
-        <div class="pane">
-            <div class="pane-header">
-                <span>Code Editor</span>
-                <span>Language: Tick</span>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-inner">
+            <h1>A dynamic, pure object-oriented language focused on <span class="highlight">simplicity</span> and <span class="highlight">fluency</span>.</h1>
+            <p class="lead">
+                Tick feels like a natural conversation between objects. It combines the pure message passing of Smalltalk-80 with the command-token clarity of Tcl.
+            </p>
+            <p class="sublead">
+                Every statement is a receiver, a keyword, or an argument—with zero decorative prepositions and zero punctuation noise. Featuring Ruby-style fluent pipelines (<code>|</code>), comma cascades (<code>,</code>), stackless Protothreads coroutines, and native FFI (<code>@</code>).
+            </p>
+            <div class="hero-actions">
+                <a href="#playground" class="btn btn-ruby">▶ Try Tick in Your Browser</a>
+                <a href="https://github.com/xyzzyapps/tick" target="_blank" class="btn btn-secondary">🐙 View on GitHub</a>
             </div>
-            <div class="pane-body">
-                <textarea id="code-editor" spellcheck="false" placeholder="Write Tick code here..."></textarea>
-            </div>
+        </div>
+    </section>
+
+    <!-- Interactive WASM Playground Section -->
+    <section id="playground" class="playground-section">
+        <div class="section-header">
+            <h2>Try Tick Live in WebAssembly</h2>
+            <p>Compile and run Tick code directly in your browser with zero installation.</p>
         </div>
 
-        <!-- Output Pane -->
-        <div class="pane">
-            <div class="pane-header">
-                <span>Terminal Output</span>
-                <span id="exec-time"></span>
+        <div class="playground-card">
+            <div class="playground-toolbar">
+                <div class="toolbar-left">
+                    <div class="window-dots">
+                        <div class="window-dot dot-red"></div>
+                        <div class="window-dot dot-yellow"></div>
+                        <div class="window-dot dot-green"></div>
+                    </div>
+                    <select id="example-select" class="playground-select">
+                        <option value="learn" selected>⭐ Learn Tick in Y Minutes (Full Tour)</option>
+                        <option value="showcase">1. Orders Showcase (Pipes & Cascades)</option>
+                        <option value="coroutine">2. Coroutine Generator (Fibonacci Stream)</option>
+                        <option value="twoway">3. 2-Way Communicating Coroutine</option>
+                        <option value="json">4. JSON & Data Collections</option>
+                        <option value="recursion">5. Recursion & Math</option>
+                        <option value="web">6. Web Browser FFI (@alert & @log)</option>
+                    </select>
+                </div>
+                <div class="toolbar-right">
+                    <button id="btn-run" class="btn-run" disabled>▶ Run</button>
+                    <button id="btn-clear" class="btn-tool">Clear</button>
+                    <button id="btn-reset" class="btn-tool">Reset VM</button>
+                </div>
             </div>
-            <div class="pane-body">
-                <div id="terminal">Initializing Tick WebAssembly runtime...</div>
-            </div>
-        </div>
-    </div>
 
-    <footer>
-        <div class="footer-shortcuts">
-            <span>Run: <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span></span>
-            <span>Tab: <span class="kbd">4 Spaces</span></span>
+            <div class="playground-body">
+                <!-- Editor Pane -->
+                <div class="editor-pane">
+                    <div class="pane-label">
+                        <span>Source Code</span>
+                        <span>Language: Tick</span>
+                    </div>
+                    <textarea id="code-editor" spellcheck="false" placeholder="Write Tick code here..."></textarea>
+                </div>
+
+                <!-- Terminal Output Pane -->
+                <div class="terminal-pane">
+                    <div class="pane-label">
+                        <span>Terminal Output</span>
+                        <span id="exec-time"></span>
+                    </div>
+                    <div id="terminal">Initializing Tick WebAssembly runtime...</div>
+                </div>
+            </div>
+
+            <div class="playground-footer">
+                <div>
+                    Shortcut: <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> to execute &bull; <span class="kbd">Tab</span> inserts 4 spaces
+                </div>
+                <div>
+                    Powered by Go & WebAssembly &bull; PolyForm Noncommercial 1.0.0
+                </div>
+            </div>
         </div>
-        <div>
-            Licensed under <a href="https://polyformproject.org/licenses/noncommercial/1.0.0/" target="_blank">PolyForm Noncommercial 1.0.0</a> &bull; Created by Xyzzy Apps
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="features-inner">
+            <div class="section-header">
+                <h2>Why Developers Love Tick</h2>
+                <p>Designed as an embeddable, featherweight scripting language for rapid prototyping.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💎</div>
+                    <h3>Pure Object-Oriented Messaging</h3>
+                    <p>
+                        Everything is an object, from integers and booleans to block closures. Objects communicate strictly via unary, binary, or keyword messages without primitive exceptions.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Zero-Filler Syntax</h3>
+                    <p>
+                        No semicolons, no trailing periods, no parenthesis soup. Newlines terminate statements, and inline expressions nest naturally using Tcl-style brackets <code>[...]</code>.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🌊</div>
+                    <h3>Fluent Pipelines & Cascades</h3>
+                    <p>
+                        Chain outputs seamlessly with the pipe (<code>|</code>) like modern Ruby or Elixir, and send sequential messages to the same receiver with comma cascades (<code>,</code>).
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🧵</div>
+                    <h3>Stackless Protothreads</h3>
+                    <p>
+                        First-class cooperative coroutines with two-way value exchange. Implemented via Adam Dunkels' stackless protothreads in C and Goroutine channels in Go.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔌</div>
+                    <h3>Foreign Function Interface (FFI)</h3>
+                    <p>
+                        Variables and functions with the <code>@</code> sigil directly invoke host C functions, system calls, and dynamic DLLs without writing glue code.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Two Implementations & WASM</h3>
+                    <p>
+                        Complete, independent reference implementations in C99 and Golang with identical semantics, plus a WebAssembly build for in-browser execution.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Side-by-Side Comparison Section -->
+    <section id="comparison" class="comparison-section">
+        <div class="section-header">
+            <h2>Smalltalk vs. Tick</h2>
+            <p>Familiar Smalltalk semantics with a streamlined, modern command-token grammar.</p>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Standard Smalltalk</th>
+                        <th>Tick</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Assignment</strong></td>
+                        <td><code>total := 0.</code></td>
+                        <td><code>set total 0</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unary Message</strong></td>
+                        <td><code>server start.</code></td>
+                        <td><code>server start</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Keyword Message</strong></td>
+                        <td><code>canvas draw: shape at: origin.</code></td>
+                        <td><code>canvas draw shape at origin</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sub-expression</strong></td>
+                        <td><code>x := a + (b factorial).</code></td>
+                        <td><code>set x [a + [b factorial]]</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Zero-Arg Block</strong></td>
+                        <td><code>[ self alert ]</code></td>
+                        <td><code>{ self alert }</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Parameterized Block</strong></td>
+                        <td><code>[ :x :y | x + y ]</code></td>
+                        <td><code>{ x y | x + y }</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fluent Pipeline</strong></td>
+                        <td><code>((items select: [:x | x valid]) collect: [:x | x name]) sorted.</code></td>
+                        <td><code>items select { x | x valid } | collect { x | x name } | sorted</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Message Cascade</strong></td>
+                        <td><code>pen up; color: "blue"; down.</code></td>
+                        <td><code>pen up, color "blue", down</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <h4>About Tick</h4>
+                <p>
+                    Tick is a strict, zero-filler synthesis of Smalltalk’s pure object-oriented message passing and Tcl’s command-token structure, designed for seamless embedding, easy prototyping, and expressive scripting.
+                </p>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="https://github.com/xyzzyapps/tick" target="_blank">GitHub Repository</a></li>
+                    <li><a href="#playground">WebAssembly Playground</a></li>
+                    <li><a href="https://github.com/xyzzyapps/tick/blob/main/README.md" target="_blank">Documentation & README</a></li>
+                    <li><a href="https://github.com/xyzzyapps/tick/tree/main/examples" target="_blank">Example Suites (.tick)</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>License & Legal</h4>
+                <p>
+                    Licensed under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0/" target="_blank" style="color:#e58d92;">PolyForm Noncommercial License 1.0.0</a>.
+                </p>
+                <p style="margin-top: 8px;">
+                    Required Notice: Copyright 2026 Xyzzy Apps &lt;xyzzyapps@gmail.com&gt;.
+                </p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>
+                &copy; 2026 <strong>Xyzzy Apps</strong>. All rights reserved.
+            </div>
+            <div>
+                Designed with the spirit of Smalltalk, Tcl, and Ruby.
+            </div>
         </div>
     </footer>
 
+    <!-- WASM & Playground Script -->
     <script>
         const EXAMPLES = {
             learn: `# ======================================================================
@@ -666,7 +1198,7 @@ set data [JSON parse payload]
 data at "status" put "WebAssembly Live"
 "Serialized: [JSON stringify data]" println
 `,
-            recursion: `# Recursive Factorial & Point Math
+            recursion: `# Recursive Factorial & Math
 integer method fact {
     [self <= 1] ifTrue {
         return 1
@@ -751,7 +1283,7 @@ set name "Web Developer"
             const res = window.tickEval(code);
             const t1 = performance.now();
 
-            execTime.textContent = `Executed in ${(t1 - t0).toFixed(1)}ms`;
+            execTime.textContent = `${(t1 - t0).toFixed(1)}ms`;
 
             let outHTML = "";
             if (res.output && res.output.trim().length > 0) {
@@ -788,15 +1320,14 @@ set name "Web Developer"
         WebAssembly.instantiateStreaming(fetch("tick.wasm"), go.importObject).then((result) => {
             go.run(result.instance);
             statusBadge.textContent = "🟢 WASM Ready";
-            statusBadge.className = "badge badge-ready";
+            statusBadge.className = "nav-badge badge-ready";
             runBtn.disabled = false;
-            terminal.innerHTML = `<span class="term-info">✅ Tick WebAssembly runtime initialized (${window.tickVersion ? window.tickVersion() : 'Tick 1.0.0'}).</span>\n<span class="term-info">Click [Run] or press Ctrl+Enter to execute.</span>\n\n`;
+            terminal.innerHTML = `<span class="term-info">✅ Tick WebAssembly runtime ready (${window.tickVersion ? window.tickVersion() : 'Tick 1.0.0'}).</span>\n<span class="term-info">Click [Run] or press Ctrl+Enter to execute.</span>\n\n`;
             editor.value = EXAMPLES.learn;
         }).catch((err) => {
             console.error("Failed to load WASM:", err);
             statusBadge.textContent = "❌ WASM Error";
-            statusBadge.className = "badge badge-polyform";
-            terminal.innerHTML = `<span class="term-error">Failed to load WebAssembly binary: ${err.message}</span>\n<span class="term-info">Note: Run via a web server (e.g. go run ./web/server.go or python -m http.server) due to CORS.</span>`;
+            terminal.innerHTML = `<span class="term-error">Failed to load WebAssembly binary: ${err.message}</span>\n<span class="term-info">Note: Run via a web server (e.g. go run ./web/server.go) due to CORS.</span>`;
         });
     </script>
 </body>
