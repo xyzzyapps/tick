@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tick WebAssembly Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="wasm_exec.js"></script>
+    <style>
+        :root {
+            --bg-base: #0f1117;
+            --bg-panel: #161822;
+            --bg-header: #12141c;
+            --border-color: #262938;
+            --accent-primary: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-code: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-ui);
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--bg-header);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .brand-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge-polyform {
+            background-color: #2e1065;
+            color: #c084fc;
+            border: 1px solid #581c87;
+        }
+
+        .badge-status {
+            background-color: #1e293b;
+            color: #94a3b8;
+            border: 1px solid #334155;
+        }
+
+        .badge-ready {
+            background-color: #064e3b;
+            color: #34d399;
+            border: 1px solid #059669;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        select {
+            background-color: #1e2230;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-family: var(--font-ui);
+            cursor: pointer;
+            outline: none;
+        }
+
+        select:focus {
+            border-color: var(--accent-primary);
+        }
+
+        button {
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: var(--font-ui);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-run {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-run:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-run:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #1e2230;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #282d3f;
+            color: var(--text-main);
+        }
+
+        .main-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background-color: var(--border-color);
+            overflow: hidden;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+        }
+
+        .pane {
+            background-color: var(--bg-panel);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .pane-header {
+            background-color: var(--bg-header);
+            padding: 10px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pane-body {
+            flex: 1;
+            position: relative;
+            display: flex;
+            overflow: hidden;
+        }
+
+        #code-editor {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            background-color: #11131a;
+            color: #e5e7eb;
+            font-family: var(--font-code);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            border: none;
+            resize: none;
+            outline: none;
+            tab-size: 4;
+            white-space: pre;
+            overflow: auto;
+        }
+
+        #terminal {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            background-color: #0d0f14;
+            color: #d1d5db;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .term-stdout {
+            color: #e2e8f0;
+        }
+
+        .term-result {
+            color: #34d399;
+            font-weight: 500;
+        }
+
+        .term-error {
+            color: #f87171;
+            background-color: rgba(239, 68, 68, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 4px 0;
+            display: inline-block;
+        }
+
+        .term-info {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin: 6px 0;
+        }
+
+        footer {
+            background-color: var(--bg-header);
+            border-top: 1px solid var(--border-color);
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        footer a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-shortcuts {
+            display: flex;
+            gap: 16px;
+        }
+
+        .kbd {
+            background-color: #1e2230;
+            border: 1px solid #334155;
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #cbd5e1;
+            font-family: var(--font-code);
+            font-size: 0.72rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-area">
+            <div class="brand-logo">TICK</div>
+            <div>
+                <div class="brand-title">Tick Web Playground</div>
+                <div class="brand-subtitle">Smalltalk Messages • Tcl Tokens • Protothreads Coroutines</div>
+            </div>
+            <span id="wasm-status" class="badge badge-status">⚡ Initializing WASM...</span>
+            <span class="badge badge-polyform">PolyForm Noncommercial 1.0.0</span>
+        </div>
+
+        <div class="toolbar">
+            <select id="example-select">
+                <option value="showcase">1. Orders Showcase (Pipes & Cascades)</option>
+                <option value="coroutine">2. Coroutine Generator (Fibonacci)</option>
+                <option value="twoway">3. 2-Way Communicating Coroutine</option>
+                <option value="json">4. JSON & Data Collections</option>
+                <option value="recursion">5. Recursion & Math</option>
+                <option value="web">6. Web FFI (@alert & @log)</option>
+            </select>
+            <button id="btn-run" class="btn-run" disabled>▶ Run</button>
+            <button id="btn-clear" class="btn-secondary">Clear Output</button>
+            <button id="btn-reset" class="btn-secondary">Reset VM</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Editor Pane -->
+        <div class="pane">
+            <div class="pane-header">
+                <span>Code Editor</span>
+                <span>Language: Tick</span>
+            </div>
+            <div class="pane-body">
+                <textarea id="code-editor" spellcheck="false" placeholder="Write Tick code here..."></textarea>
+            </div>
+        </div>
+
+        <!-- Output Pane -->
+        <div class="pane">
+            <div class="pane-header">
+                <span>Terminal Output</span>
+                <span id="exec-time"></span>
+            </div>
+            <div class="pane-body">
+                <div id="terminal">Initializing Tick WebAssembly runtime...</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-shortcuts">
+            <span>Run: <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span></span>
+            <span>Tab: <span class="kbd">4 Spaces</span></span>
+        </div>
+        <div>
+            Licensed under <a href="https://polyformproject.org/licenses/noncommercial/1.0.0/" target="_blank">PolyForm Noncommercial 1.0.0</a> &bull; Created by Xyzzy Apps
+        </div>
+    </footer>
+
+    <script>
+        const EXAMPLES = {
+            showcase: `# 1. Class & Method Definition
+Object subclass OrderProcessor vars { taxRate logger }
+
+OrderProcessor method initializeWithTax rate logger log {
+    set taxRate rate
+    set logger log
+}
+
+OrderProcessor method processOrders orders onError errorBlock {
+    # Fluent pipeline with { param | body } blocks
+    set validOrders [
+        orders select { o | o isPaid }
+        | reject { o | o isCancelled }
+        | sortBy { a b | [a timestamp] < [b timestamp] }
+    ]
+
+    [validOrders isEmpty] ifTrue {
+        errorBlock value "No valid orders found"
+        return 0
+    } ifFalse {
+        logger info "Processing [validOrders size] orders"
+    }
+
+    # Fold/Inject Pipeline
+    set grandTotal [
+        validOrders collect { o | [o amount] * [1 + taxRate] }
+        | inject 0 into { sum val | sum + val }
+    ]
+
+    # Comma Cascade (sends all three messages to logger)
+    logger info "Batch complete",
+           recordMetric "revenue" value grandTotal,
+           flush
+
+    return grandTotal
+}
+
+# Helper Order class
+Object subclass Order vars { isPaid isCancelled timestamp amount }
+Order method paid p cancelled c timestamp t amount a {
+    set isPaid p
+    set isCancelled c
+    set timestamp t
+    set amount a
+}
+Order method isPaid { return isPaid }
+Order method isCancelled { return isCancelled }
+Order method timestamp { return timestamp }
+Order method amount { return amount }
+
+# Helper Logger class
+Object subclass Logger vars {}
+Logger method info msg { "INFO: $msg" println }
+Logger method recordMetric key value val { "METRIC: $key = $val" println }
+Logger method flush { "LOGGER: Flushed buffer" println }
+
+# Run Showcase
+set logger [Logger new]
+set processor [OrderProcessor new , initializeWithTax 0.05 logger logger]
+
+set o1 [Order new , paid true cancelled false timestamp 100 amount 100]
+set o2 [Order new , paid true cancelled false timestamp 105 amount 100]
+set o3 [Order new , paid false cancelled true timestamp 90 amount 50]
+
+set orders [list new , add o1 , add o2 , add o3]
+set total [processor processOrders orders onError { msg | "Error: $msg" println }]
+"Grand Total (with 5% tax): $total" println
+`,
+            coroutine: `# Coroutine Stream Generator (Fibonacci)
+set makeFibStream {
+    coroutine create {
+        set a 0
+        set b 1
+        coroutine yield a
+        coroutine yield b
+        set next [a + b]
+        coroutine yield next
+        set a b
+        set b next
+        set next [a + b]
+        coroutine yield next
+        set a b
+        set b next
+        set next [a + b]
+        coroutine yield next
+        set a b
+        set b next
+        set next [a + b]
+        coroutine yield next
+    }
+}
+
+set fib [makeFibStream value]
+"Fib status: [fib status]" println
+"Fib term 1: [fib resume]" println
+"Fib term 2: [fib resume]" println
+"Fib term 3: [fib resume]" println
+"Fib term 4: [fib resume]" println
+"Fib term 5: [fib resume]" println
+"Fib term 6: [fib resume]" println
+"Final status: [fib status]" println
+`,
+            twoway: `# Two-Way Communicating Coroutine
+set worker [
+    coroutine create { initial |
+        set step1 [coroutine yield [initial * 2]]
+        set step2 [coroutine yield [step1 + 50]]
+        return [step2 * 10]
+    }
+]
+
+"Worker initial status: [worker status]" println
+"Sent 10, yielded: [worker resume 10]" println
+"Sent 5,  yielded: [worker resume 5]" println
+"Sent 3,  final return: [worker resume 3]" println
+"Worker final status: [worker status]" println
+"Worker is done: [worker isDone]" println
+`,
+            json: `# JSON Serialization and Rich Types
+set payload "{\\"language\\":\\"Tick\\",\\"version\\":1,\\"fast\\":true,\\"tags\\":[\\"oop\\",\\"tcl\\",\\"wasm\\"]}"
+set data [JSON parse payload]
+
+"Parsed Language: [data at 'language']" println
+"Parsed Version:  [data at 'version']" println
+"Parsed Tags:     [data at 'tags' | join ' • ']" println
+
+# Mutate and serialize back
+data at "status" put "WebAssembly Live"
+"Serialized: [JSON stringify data]" println
+`,
+            recursion: `# Recursive Factorial & Point Math
+integer method fact {
+    [self <= 1] ifTrue {
+        return 1
+    } ifFalse {
+        return [self * [[self - 1] fact]]
+    }
+}
+
+"7! = [7 fact]" println
+"10! = [10 fact]" println
+
+# 2D Point Binary Operator @
+set p1 [10@20]
+set p2 [30@40]
+set p3 [p1 + p2]
+"Point 1: $p1" println
+"Point 2: $p2" println
+"Sum:     $p3 (x=[p3 x], y=[p3 y])" println
+`,
+            web: `# Tick Web FFI: Calling the Browser Environment
+@log "Hello from Tick running in WebAssembly!"
+
+set name "Web Developer"
+"Welcome to Tick WASM, $name!" println
+
+# Pop up an alert dialog
+@alert "Tick is running inside your browser via WebAssembly!"
+`
+        };
+
+        const editor = document.getElementById('code-editor');
+        const terminal = document.getElementById('terminal');
+        const runBtn = document.getElementById('btn-run');
+        const clearBtn = document.getElementById('btn-clear');
+        const resetBtn = document.getElementById('btn-reset');
+        const statusBadge = document.getElementById('wasm-status');
+        const exampleSelect = document.getElementById('example-select');
+        const execTime = document.getElementById('exec-time');
+
+        // Setup Tab key inside editor
+        editor.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = editor.selectionStart;
+                const end = editor.selectionEnd;
+                editor.value = editor.value.substring(0, start) + "    " + editor.value.substring(end);
+                editor.selectionStart = editor.selectionEnd = start + 4;
+            } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (!runBtn.disabled) runCode();
+            }
+        });
+
+        // Example dropdown
+        exampleSelect.addEventListener('change', () => {
+            const key = exampleSelect.value;
+            if (EXAMPLES[key]) {
+                editor.value = EXAMPLES[key];
+            }
+        });
+
+        // Clear Terminal
+        clearBtn.addEventListener('click', () => {
+            terminal.innerHTML = "";
+            execTime.textContent = "";
+        });
+
+        // Reset VM
+        resetBtn.addEventListener('click', () => {
+            if (window.tickReset) {
+                const res = window.tickReset();
+                terminal.innerHTML = `<span class="term-info">⚡ ${res.message}</span>\n`;
+            }
+        });
+
+        // Run Code
+        function runCode() {
+            if (!window.tickEval) {
+                terminal.innerHTML += `<span class="term-error">WASM runtime not ready yet.</span>\n`;
+                return;
+            }
+
+            const code = editor.value;
+            const t0 = performance.now();
+            const res = window.tickEval(code);
+            const t1 = performance.now();
+
+            execTime.textContent = `Executed in ${(t1 - t0).toFixed(1)}ms`;
+
+            let outHTML = "";
+            if (res.output && res.output.trim().length > 0) {
+                outHTML += `<span class="term-stdout">${escapeHtml(res.output)}</span>`;
+            }
+
+            if (res.error && res.error.length > 0) {
+                outHTML += `<div class="term-error">❌ ${escapeHtml(res.error)}</div>\n`;
+            } else if (res.result && res.result.length > 0 && res.result !== "nil") {
+                outHTML += `<div class="term-result">=> ${escapeHtml(res.result)}</div>\n`;
+            }
+
+            if (!outHTML) {
+                outHTML = `<span class="term-info">(Statement executed with no output)</span>\n`;
+            }
+
+            terminal.innerHTML += outHTML;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        runBtn.addEventListener('click', runCode);
+
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Initialize Go WASM
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("tick.wasm"), go.importObject).then((result) => {
+            go.run(result.instance);
+            statusBadge.textContent = "🟢 WASM Ready";
+            statusBadge.className = "badge badge-ready";
+            runBtn.disabled = false;
+            terminal.innerHTML = `<span class="term-info">✅ Tick WebAssembly runtime initialized (${window.tickVersion ? window.tickVersion() : 'Tick 1.0.0'}).</span>\n<span class="term-info">Click [Run] or press Ctrl+Enter to execute.</span>\n\n`;
+            editor.value = EXAMPLES.showcase;
+        }).catch((err) => {
+            console.error("Failed to load WASM:", err);
+            statusBadge.textContent = "❌ WASM Error";
+            statusBadge.className = "badge badge-polyform";
+            terminal.innerHTML = `<span class="term-error">Failed to load WebAssembly binary: ${err.message}</span>\n<span class="term-info">Note: Run via a web server (e.g. go run ./web/server.go or python -m http.server) due to CORS.</span>`;
+        });
+    </script>
+</body>
+</html>
