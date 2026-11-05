@@ -1091,22 +1091,17 @@ static Obj* m_arr_last(Obj* recv, int argc, Obj** argv, VM* vm) {
     return recv->as.array.items[recv->as.array.count - 1];
 }
 static Obj* m_arr_at(Obj* recv, int argc, Obj** argv, VM* vm) {
-    if (argc < 1) return obj_new_nil();
+    if (argc < 1 || recv->type != OBJ_ARRAY) return obj_new_nil();
     int idx = (int)obj_to_int(argv[0]);
-    // 1-based index support
+    // Strict 1-based indexing (Smalltalk standard)
     if (idx >= 1 && idx <= recv->as.array.count) return recv->as.array.items[idx - 1];
-    if (idx >= 0 && idx < recv->as.array.count) return recv->as.array.items[idx];
     return obj_new_nil();
 }
 static Obj* m_arr_at_put(Obj* recv, int argc, Obj** argv, VM* vm) {
-    if (argc < 2) return obj_new_nil();
+    if (argc < 2 || recv->type != OBJ_ARRAY) return obj_new_nil();
     int idx = (int)obj_to_int(argv[0]);
     if (idx >= 1 && idx <= recv->as.array.count) {
         recv->as.array.items[idx - 1] = argv[1];
-        return argv[1];
-    }
-    if (idx >= 0 && idx < recv->as.array.count) {
-        recv->as.array.items[idx] = argv[1];
         return argv[1];
     }
     return obj_new_nil();

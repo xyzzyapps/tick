@@ -343,14 +343,11 @@ func InitBuiltinMethods(vm *VM) {
 			return nil, fmt.Errorf("array index must be integer")
 		}
 		idx := int(idxVal.Val)
-		// Smalltalk is 1-based; support 1-based and 0-based
+		// Strict 1-based indexing (Smalltalk standard)
 		if idx >= 1 && idx <= len(arr.Elements) {
 			return arr.Elements[idx-1], nil
 		}
-		if idx >= 0 && idx < len(arr.Elements) {
-			return arr.Elements[idx], nil
-		}
-		return NilVal{}, fmt.Errorf("index out of bounds: %d (size: %d)", idx, len(arr.Elements))
+		return NilVal{}, fmt.Errorf("index out of bounds: %d (1-based index, size: %d)", idx, len(arr.Elements))
 	})
 	ArrayClass.AddNativeMethod("at:put:", func(recv Value, args []Value, v *VM) (Value, error) {
 		if err := CheckArgCount("at:put:", args, 2); err != nil {
@@ -366,11 +363,7 @@ func InitBuiltinMethods(vm *VM) {
 			arr.Elements[idx-1] = args[1]
 			return args[1], nil
 		}
-		if idx >= 0 && idx < len(arr.Elements) {
-			arr.Elements[idx] = args[1]
-			return args[1], nil
-		}
-		return NilVal{}, fmt.Errorf("index out of bounds: %d", idx)
+		return NilVal{}, fmt.Errorf("index out of bounds: %d (1-based index, size: %d)", idx, len(arr.Elements))
 	})
 	ArrayClass.AddNativeMethod("add:", func(recv Value, args []Value, v *VM) (Value, error) {
 		if err := CheckArgCount("add:", args, 1); err != nil {
@@ -397,14 +390,11 @@ func InitBuiltinMethods(vm *VM) {
 		arr := recv.(*ArrayVal)
 		idx := int(toInt(args[0]))
 		if idx >= 1 && idx <= len(arr.Elements) {
-			idx--
-		}
-		if idx >= 0 && idx < len(arr.Elements) {
-			removed := arr.Elements[idx]
-			arr.Elements = append(arr.Elements[:idx], arr.Elements[idx+1:]...)
+			removed := arr.Elements[idx-1]
+			arr.Elements = append(arr.Elements[:idx-1], arr.Elements[idx:]...)
 			return removed, nil
 		}
-		return NilVal{}, fmt.Errorf("index out of bounds: %d", idx)
+		return NilVal{}, fmt.Errorf("index out of bounds: %d (1-based index, size: %d)", idx, len(arr.Elements))
 	})
 	ArrayClass.AddNativeMethod("join:", func(recv Value, args []Value, v *VM) (Value, error) {
 		if err := CheckArgCount("join:", args, 1); err != nil {

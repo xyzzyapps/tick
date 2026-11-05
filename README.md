@@ -168,7 +168,7 @@ Tick preserves Smalltalk's pure object-oriented message passing for collections 
 | **Instantiation** | `list := OrderedCollection new.` | `set list [List new]` *(or `Array new`)* |
 | **Append Item** | `list add: 42.` | `list add 42` |
 | **Cascade Appends** | `list add: 1; add: 2; add: 3; yourself.` | `list add 1, add 2, add 3` |
-| **Access by Index** | `elem := list at: 1.` *(1-based)* | `set elem [list at 1]` *(1-based; 0 also accepted as alias for 1st item)* |
+| **Access by Index** | `elem := list at: 1.` *(1-based)* | `set elem [list at 1]` *(1-based; index 1 is 1st element)* |
 | **Mutate by Index** | `list at: 1 put: 99.` | `list at 1 put 99` |
 | **First / Last** | `list first. list last.` | `list first` / `list last` |
 | **Size / Length** | `list size.` | `list size` *(or `count`, `length`)* |
