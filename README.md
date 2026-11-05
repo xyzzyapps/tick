@@ -230,6 +230,34 @@ set jsonOutput [students asJson]
 "Exported JSON: $jsonOutput" println
 ```
 
+### Error Handling (Errors as Values)
+
+Tick deliberately excludes complex exception machinery (no hidden control jumps, stack unwinding, or `try/catch`). Following the Go and C philosophy, errors are plain first-class values, handled explicitly via tuples, fallback blocks, or userland `Result` objects:
+
+```tcl
+# 1. Go-style [value, err] tuple
+File method read path {
+    [path == "missing.txt"] ifTrue {
+        return [List new , add nil , add "file not found"]
+    }
+    return [List new , add "data" , add nil]
+}
+set res [File read "missing.txt"]
+set err [res at 2]
+[err notNil] ifTrue { "Error: $err" println }
+
+# 2. Smalltalk-style fallback blocks
+Service method query id onError errBlock {
+    [id <= 0] ifTrue { return [errBlock value "invalid ID"] }
+    return "Record-$id"
+}
+set record [Service query -1 onError { e | return "default-user" }]
+
+# 3. Userland Result class (isOk, unwrap, error)
+set res [Math safeDivide 10 by 0]
+[res isOk] ifFalse { "Failed: [res error]" println }
+```
+
 ---
 
 ## Complete Language Showcase
