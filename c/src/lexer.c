@@ -189,23 +189,49 @@ TokenList lexer_tokenize(const char* source) {
             continue;
         }
 
-        // Strings
-        if (ch == '"') {
+        // Strings ("..." or '...')
+        if (ch == '"' || ch == '\'') {
+            char quote_char = ch;
             pos++; col++;
             int buf_cap = 64;
             int buf_len = 0;
             char* buf = (char*)malloc(buf_cap);
 
-            while (pos < len && source[pos] != '"') {
+            while (pos < len) {
+                if (source[pos] == quote_char) {
+                    // In single-quote Smalltalk strings, '' is an escaped single quote
+                    if (quote_char == '\'' && pos + 1 < len && source[pos + 1] == '\'') {
+                        pos += 2;
+                        col += 2;
+                        if (buf_len + 2 >= buf_cap) {
+                            buf_cap *= 2;
+                            buf = (char*)realloc(buf, buf_cap);
+                        }
+                        buf[buf_len++] = '\'';
+                        continue;
+                    }
+                    break;
+                }
                 char sc = source[pos++];
-                col++;
+                if (sc == '\n') {
+                    line++;
+                    col = 1;
+                } else {
+                    col++;
+                }
                 if (sc == '\\' && pos < len) {
                     char esc = source[pos++];
-                    col++;
+                    if (esc == '\n') {
+                        line++;
+                        col = 1;
+                    } else {
+                        col++;
+                    }
                     if (esc == 'n') sc = '\n';
                     else if (esc == 't') sc = '\t';
                     else if (esc == 'r') sc = '\r';
                     else if (esc == '"') sc = '"';
+                    else if (esc == '\'') sc = '\'';
                     else if (esc == '\\') sc = '\\';
                     else if (esc == '$') sc = '$';
                     else if (esc == '[') sc = '[';
@@ -218,7 +244,7 @@ TokenList lexer_tokenize(const char* source) {
                 }
                 buf[buf_len++] = sc;
             }
-            if (pos < len && source[pos] == '"') {
+            if (pos < len && source[pos] == quote_char) {
                 pos++; col++;
             }
             buf[buf_len] = '\0';

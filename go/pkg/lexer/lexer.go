@@ -98,8 +98,8 @@ func (l *Lexer) Tokenize() ([]Token, error) {
 		case ',':
 			rawTokens = append(rawTokens, Token{Type: TOKEN_COMMA, Lexeme: ",", Line: startLine, Column: startCol})
 
-		case '"':
-			str, err := l.readString()
+		case '"', '\'':
+			str, err := l.readString(ch)
 			if err != nil {
 				return nil, err
 			}
@@ -281,11 +281,17 @@ func (l *Lexer) readNumber(first rune) (string, bool) {
 	return string(num), isFloat
 }
 
-func (l *Lexer) readString() (string, error) {
+func (l *Lexer) readString(quoteChar rune) (string, error) {
 	var sb strings.Builder
 	for !l.isAtEnd() {
 		ch := l.advance()
-		if ch == '"' {
+		if ch == quoteChar {
+			// In single-quote Smalltalk strings, '' is an escaped single quote
+			if quoteChar == '\'' && l.peek() == '\'' {
+				l.advance()
+				sb.WriteRune('\'')
+				continue
+			}
 			return sb.String(), nil
 		}
 		if ch == '\\' {
@@ -302,6 +308,8 @@ func (l *Lexer) readString() (string, error) {
 				sb.WriteRune('\r')
 			case '"':
 				sb.WriteRune('"')
+			case '\'':
+				sb.WriteRune('\'')
 			case '\\':
 				sb.WriteRune('\\')
 			case '$':
