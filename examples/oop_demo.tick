@@ -1,0 +1,59 @@
+# Test Object-Oriented Principles in Tick
+Object subclass Animal vars { name sound }
+
+Animal method init nameVal sound soundVal {
+    set name nameVal
+    set sound soundVal
+}
+
+Animal method getName { return name }
+Animal method getSound { return sound }
+
+Animal method speak {
+    "$name says: $sound" println
+}
+
+# Subclassing (Inheritance)
+Animal subclass Dog vars { breed }
+
+Dog method initDog nameVal breed breedVal {
+    set name nameVal
+    set sound "Woof!"
+    set breed breedVal
+}
+
+Dog method getBreed { return breed }
+
+Dog method speak {
+    "$name the $breed barks: $sound" println
+}
+
+Animal subclass Cat vars { lives }
+
+Cat method initCat nameVal {
+    set name nameVal
+    set sound "Meow!"
+    set lives 9
+}
+
+Cat method speak {
+    "$name purrs softly: $sound (lives: $lives)" println
+}
+
+# Instantiation & Cascading
+set dog [Dog new , initDog "Rover" breed "Collie"]
+set cat [Cat new , initCat "Luna"]
+
+# Polymorphism
+dog speak
+cat speak
+
+# Encapsulation: instance variables accessed via methods
+"Dog name: [dog getName], breed: [dog getBreed]" println
+"Cat name: [cat getName], sound: [cat getSound]" println
+
+# Open Classes (Monkey-patching built-ins)
+integer method square {
+    return [self * self]
+}
+"5 squared = [5 square]" println

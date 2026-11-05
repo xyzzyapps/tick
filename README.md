@@ -53,6 +53,92 @@ Both implementations support the full language grammar, pure Smalltalk message p
 
 ---
 
+## Object-Oriented Principles in Tick
+
+Tick is a **pure object-oriented programming language**, faithfully implementing the core principles established by Alan Kay and Smalltalk-80, expressed through Tcl’s lightweight command-token syntax:
+
+### 1. Everything is an Object
+There are no primitive unboxed types. Numbers (`integer`, `float`), strings, booleans (`true`, `false`), blocks (`{ ... }`), arrays/lists, dictionaries, coroutines, and classes themselves are all first-class objects inheriting from `Object`:
+- Even control flow is object messaging: `[count > 0] ifTrue { ... } ifFalse { ... }` sends `#ifTrue:ifFalse:` to a `Boolean` object (`True` or `False`).
+- Arithmetic is object messaging: `3 + 4` sends the binary message `+` with argument `4` to the `Integer` receiver `3`.
+
+### 2. Classes & Dynamic Subclassing
+Classes are first-class runtime objects (instances of `Metaclass`). Any class can be subclassed dynamically:
+```tcl
+# Define a base class with instance variables
+Object subclass Animal vars { name sound }
+
+# Subclassing inherits all state and behavior
+Animal subclass Dog vars { breed }
+Animal subclass Cat vars { lives }
+```
+
+### 3. Encapsulation & Instance Variables
+Instance variables are private to each instance. They can be read and mutated within the methods of the class hierarchy, but cannot be accessed directly from the outside:
+```tcl
+# Method definition with keyword parameters
+Animal method init nameVal sound soundVal {
+    set name nameVal
+    set sound soundVal
+}
+
+Animal method speak {
+    "$name says: $sound" println
+}
+```
+> **Assignment Note**: Tick uses the clean keyword `set` for all variable and instance variable assignment (`set name nameVal`), never punctuation symbols or exclamation marks.
+
+### 4. Polymorphism & Dynamic Dispatch
+Method resolution is late-bound and determined at runtime based on the actual class of the receiver:
+```tcl
+Dog method initDog nameVal breed breedVal {
+    set name nameVal
+    set sound "Woof!"
+    set breed breedVal
+}
+
+Dog method speak {
+    "$name the $breed barks: $sound" println
+}
+
+Cat method initCat nameVal {
+    set name nameVal
+    set sound "Meow!"
+    set lives 9
+}
+
+Cat method speak {
+    "$name purrs: $sound (lives: $lives)" println
+}
+
+# Polymorphic invocation:
+set animals [Array new , add [Dog new , initDog "Rover" breed "Collie"] , add [Cat new , initCat "Luna"]]
+animals do { a | a speak }
+```
+
+### 5. `self` and Comma Cascades
+Inside any method, `self` refers to the active receiver. If a method does not explicitly return a value with `return`, it implicitly returns `self`. This enables natural Smalltalk-style message cascading with commas:
+```tcl
+set dog [
+    Dog new
+    , initDog "Rover" breed "Collie"
+    , speak
+]
+```
+
+### 6. Open Classes (Extensibility)
+Classes in Tick are open—new methods can be added to existing user-defined classes or core built-in classes at any time:
+```tcl
+# Extend built-in integers with a custom method
+integer method square {
+    return [self * self]
+}
+
+"5 squared = [5 square]" println   # => 25
+```
+
+---
+
 ## Side-by-Side Reference
 
 | Feature | Standard Smalltalk | Tick |

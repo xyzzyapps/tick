@@ -87,11 +87,52 @@ buffer add "Apple",
 set items [buffer join ", "]
 "Buffer count: [buffer size], items: $items" println
 
-# 8. CLASSES & OBJECT-ORIENTED PROGRAMMING
-# Define classes via 'Object subclass <Name> vars { ivar1 ivar2 }':
+# 8. PURE OBJECT-ORIENTED PROGRAMMING (Smalltalk-80 Heritage)
+# Everything in Tick is an object.
+# Assignment is ALWAYS the keyword 'set' (e.g. 'set var value' or 'set ivar value').
+# No exclamation mark (!) is used for assignment.
+
+# Base class definition with instance variables:
+Object subclass Shape vars { name }
+Shape method name n { set name n }
+Shape method getName { return name }
+
+# Subclassing (Inheritance):
+Shape subclass Rectangle vars { width height }
+
+Rectangle method width w height h {
+    set name "Rectangle"
+    set width w
+    set height h
+}
+
+# Encapsulation & Polymorphism:
+Rectangle method area {
+    return [width * height]
+}
+
+Shape subclass Circle vars { radius }
+
+Circle method radius r {
+    set name "Circle"
+    set radius r
+}
+
+Circle method area {
+    return [3.14159 * [radius * radius]]
+}
+
+# Instantiate objects and configure with comma cascades:
+set rect [Rectangle new , width 10 height 5]
+set circ [Circle new , radius 7]
+
+# Polymorphic dispatch:
+"Shape: [rect getName], area: [rect area]" println
+"Shape: [circ getName], area: [circ area]" println
+
+# BankAccount Class Example:
 Object subclass BankAccount vars { owner balance }
 
-# Define methods via '<Class> method <signature> { body }':
 BankAccount method owner ownerName balance initialDeposit {
     set owner ownerName
     set balance initialDeposit
@@ -116,14 +157,13 @@ BankAccount method withdraw amount {
 BankAccount method getBalance { return balance }
 BankAccount method getOwner { return owner }
 
-# Create and use the object via cascade:
 set account [BankAccount new , owner "Alice" balance 100]
 account deposit 50
 account withdraw 30
 "Final balance for [account getOwner]: $[account getBalance]" println
 
-# 9. RECURSION
-# Methods and blocks can be fully recursive:
+# 9. OPEN CLASSES & RECURSION
+# Any class (even built-ins) can be opened and extended with new methods:
 integer method factorial {
     [self <= 1] ifTrue {
         return 1
@@ -131,7 +171,7 @@ integer method factorial {
         return [self * [[self - 1] factorial]]
     }
 }
-"6! = [6 factorial]" println        # => 720
+"factorial(6) = [6 factorial]" println    # => 720
 
 # 10. COROUTINES (Stackless Protothreads in C / Channels in Go)
 # Cooperative multitasking with 2-way argument passing:

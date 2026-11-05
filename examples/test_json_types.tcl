@@ -72,4 +72,4 @@ integer method factorial {
         return [self * [[self - 1] factorial]]
     }
 }
-@puts "7! = [7 factorial]"
+@puts "fact(7) = [7 factorial]"

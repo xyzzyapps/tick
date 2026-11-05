@@ -505,6 +505,119 @@
             line-height: 1.55;
         }
 
+        /* Object-Oriented Principles Section */
+        section.oo-section {
+            background-color: var(--ruby-cream);
+            border-bottom: 1px solid var(--ruby-border);
+            padding: 60px 24px;
+        }
+
+        .oo-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .oo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 36px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 900px) {
+            .oo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .oo-pillar-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .oo-pillar-item {
+            display: flex;
+            gap: 16px;
+            background-color: #ffffff;
+            border: 1px solid var(--ruby-border);
+            border-radius: 8px;
+            padding: 18px 20px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .oo-pillar-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            border-color: #d1c7c2;
+        }
+
+        .oo-pillar-icon {
+            font-size: 1.6rem;
+            line-height: 1;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .oo-pillar-content h4 {
+            font-family: var(--font-serif);
+            font-size: 1.05rem;
+            color: var(--ruby-text-title);
+            margin-bottom: 4px;
+        }
+
+        .oo-pillar-content p {
+            font-size: 0.88rem;
+            color: var(--ruby-text-body);
+            line-height: 1.5;
+        }
+
+        .oo-code-card {
+            background-color: var(--code-bg);
+            border: 1px solid var(--code-border);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .oo-code-header {
+            background-color: var(--code-header);
+            border-bottom: 1px solid var(--code-border);
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: #a8a0b0;
+        }
+
+        .oo-code-body {
+            padding: 18px 20px;
+            color: var(--code-text);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 1.65;
+            overflow-x: auto;
+            flex: 1;
+            margin: 0;
+            white-space: pre;
+        }
+
+        .oo-note-box {
+            margin-top: 24px;
+            background-color: #fff1f2;
+            border-left: 4px solid var(--ruby-red);
+            padding: 14px 18px;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.88rem;
+            color: #881337;
+            line-height: 1.5;
+        }
+
         /* Comparison Section */
         section.comparison-section {
             max-width: 1200px;
@@ -652,6 +765,7 @@
             <ul class="nav-links">
                 <li><a href="#playground">Playground</a></li>
                 <li><a href="#features">Features</a></li>
+                <li><a href="#oo-principles">OOP Principles</a></li>
                 <li><a href="#comparison">Smalltalk vs Tick</a></li>
                 <li><a href="https://github.com/xyzzyapps/tick" target="_blank">GitHub ↗</a></li>
                 <li><span id="wasm-status" class="nav-badge">⚡ Loading WASM...</span></li>
@@ -693,6 +807,7 @@
                     </div>
                     <select id="example-select" class="playground-select">
                         <option value="learn" selected>⭐ Learn Tick in Y Minutes (Full Tour)</option>
+                        <option value="oop">🏛️ Object-Oriented Principles (Classes & Inheritance)</option>
                         <option value="showcase">1. Orders Showcase (Pipes & Cascades)</option>
                         <option value="coroutine">2. Coroutine Generator (Fibonacci Stream)</option>
                         <option value="twoway">3. 2-Way Communicating Coroutine</option>
@@ -799,6 +914,127 @@
         </div>
     </section>
 
+    <!-- Object-Oriented Principles Section -->
+    <section id="oo-principles" class="oo-section">
+        <div class="oo-inner">
+            <div class="section-header">
+                <h2>Pure Object-Oriented Principles</h2>
+                <p>Rooted in the timeless object messaging philosophy of Alan Kay and Smalltalk-80.</p>
+            </div>
+
+            <div class="oo-grid">
+                <!-- Left: The 6 Core Pillars -->
+                <div class="oo-pillar-list">
+                    <div class="oo-pillar-item">
+                        <div class="oo-pillar-icon">💎</div>
+                        <div class="oo-pillar-content">
+                            <h4>1. Everything is an Object</h4>
+                            <p>
+                                There are zero unboxed primitive types. Numbers, strings, booleans, code blocks (<code>{ ... }</code>), and classes themselves are first-class objects inheriting from <code>Object</code>. Arithmetic and conditionals are message sends!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="oo-pillar-item">
+                        <div class="oo-pillar-icon">🏛️</div>
+                        <div class="oo-pillar-content">
+                            <h4>2. Classes & Dynamic Subclassing</h4>
+                            <p>
+                                Classes are first-class runtime objects (instances of <code>Metaclass</code>). Create classes and subclasses dynamically using <code>Superclass subclass Name vars { ivar1 ivar2 }</code>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="oo-pillar-item">
+                        <div class="oo-pillar-icon">🔒</div>
+                        <div class="oo-pillar-content">
+                            <h4>3. Encapsulation & Clean Assignment</h4>
+                            <p>
+                                Instance variables are private to each instance and protected from external access. All state mutation uses the clean keyword <code>set</code> (e.g. <code>set balance [balance + amount]</code>)—never punctuation sigils or exclamation marks.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="oo-pillar-item">
+                        <div class="oo-pillar-icon">🎭</div>
+                        <div class="oo-pillar-content">
+                            <h4>4. Polymorphism & Dynamic Dispatch</h4>
+                            <p>
+                                Method resolution is late-bound at runtime. Diverse classes can implement common selectors (e.g. <code>speak</code>, <code>area</code>), and the runtime dispatches to the correct receiver implementation.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="oo-pillar-item">
+                        <div class="oo-pillar-icon">🔄</div>
+                        <div class="oo-pillar-content">
+                            <h4>5. Implicit Self & Comma Cascades</h4>
+                            <p>
+                                Every method implicitly returns <code>self</code> if not terminated by <code>return</code>, enabling natural Smalltalk cascading where multiple messages are chained on one receiver with commas (<code>,</code>).
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="oo-pillar-item">
+                        <div class="oo-pillar-icon">🧬</div>
+                        <div class="oo-pillar-content">
+                            <h4>6. Open Classes (Metaprogramming)</h4>
+                            <p>
+                                Any class—including core built-ins like <code>integer</code>, <code>string</code>, or <code>Array</code>—can be reopened and extended with custom methods at runtime.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Annotated Code Window -->
+                <div class="oo-code-card">
+                    <div class="oo-code-header">
+                        <span>oop_architecture.tick</span>
+                        <span>Smalltalk-80 Semantics</span>
+                    </div>
+                    <pre class="oo-code-body"><code># 1. Base Class with Instance Variables
+Object subclass Animal vars { name sound }
+
+Animal method init nameVal sound soundVal {
+    set name nameVal
+    set sound soundVal
+}
+
+Animal method getName { return name }
+Animal method speak {
+    "$name says: $sound" println
+}
+
+# 2. Subclassing & Method Overriding (Inheritance)
+Animal subclass Dog vars { breed }
+
+Dog method initDog nameVal breed breedVal {
+    set name nameVal
+    set sound "Woof!"
+    set breed breedVal
+}
+
+Dog method speak {
+    "$name the $breed barks: $sound" println
+}
+
+# 3. Cascading Instantiation & Polymorphism
+set dog [Dog new , initDog "Rover" breed "Collie"]
+dog speak    # => Rover the Collie barks: Woof!
+
+# 4. Open Classes (Extend built-ins)
+integer method square {
+    return [self * self]
+}
+"5 squared = [5 square]" println  # => 25</code></pre>
+                    <div class="oo-note-box">
+                        <strong>Guaranteed Syntax:</strong> Tick strictly uses the readable keyword <code>set</code> for all assignments (<code>set var value</code>). The exclamation mark (<code>!</code>) is never used for assignment.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Side-by-Side Comparison Section -->
     <section id="comparison" class="comparison-section">
         <div class="section-header">
@@ -855,6 +1091,21 @@
                         <td><strong>Message Cascade</strong></td>
                         <td><code>pen up; color: "blue"; down.</code></td>
                         <td><code>pen up, color "blue", down</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Class Definition</strong></td>
+                        <td><code>Object subclass: #Dog instanceVariableNames: 'breed'</code></td>
+                        <td><code>Object subclass Dog vars { breed }</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Method Definition</strong></td>
+                        <td><code>Dog >> speak [ ^ 'Woof!' ]</code></td>
+                        <td><code>Dog method speak { return "Woof!" }</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Implicit Self Return</strong></td>
+                        <td><code>deposit: amt [ balance := balance + amt. ^self ]</code></td>
+                        <td><code>Account method deposit amt { set balance [balance + amt] }</code></td>
                     </tr>
                 </tbody>
             </table>
@@ -991,11 +1242,52 @@ buffer add "Apple",
 set items [buffer join ", "]
 "Buffer count: [buffer size], items: $items" println
 
-# 8. CLASSES & OBJECT-ORIENTED PROGRAMMING
-# Define classes via 'Object subclass <Name> vars { ivar1 ivar2 }':
+# 8. PURE OBJECT-ORIENTED PROGRAMMING (Smalltalk-80 Heritage)
+# Everything in Tick is an object.
+# Assignment is ALWAYS the keyword 'set' (e.g. 'set var value' or 'set ivar value').
+# No exclamation mark (!) is used for assignment.
+
+# Base class definition with instance variables:
+Object subclass Shape vars { name }
+Shape method name n { set name n }
+Shape method getName { return name }
+
+# Subclassing (Inheritance):
+Shape subclass Rectangle vars { width height }
+
+Rectangle method width w height h {
+    set name "Rectangle"
+    set width w
+    set height h
+}
+
+# Encapsulation & Polymorphism:
+Rectangle method area {
+    return [width * height]
+}
+
+Shape subclass Circle vars { radius }
+
+Circle method radius r {
+    set name "Circle"
+    set radius r
+}
+
+Circle method area {
+    return [3.14159 * [radius * radius]]
+}
+
+# Instantiate objects and configure with comma cascades:
+set rect [Rectangle new , width 10 height 5]
+set circ [Circle new , radius 7]
+
+# Polymorphic dispatch:
+"Shape: [rect getName], area: [rect area]" println
+"Shape: [circ getName], area: [circ area]" println
+
+# BankAccount Class Example:
 Object subclass BankAccount vars { owner balance }
 
-# Define methods via '<Class> method <signature> { body }':
 BankAccount method owner ownerName balance initialDeposit {
     set owner ownerName
     set balance initialDeposit
@@ -1020,14 +1312,13 @@ BankAccount method withdraw amount {
 BankAccount method getBalance { return balance }
 BankAccount method getOwner { return owner }
 
-# Create and use the object via cascade:
 set account [BankAccount new , owner "Alice" balance 100]
 account deposit 50
 account withdraw 30
 "Final balance for [account getOwner]: $[account getBalance]" println
 
-# 9. RECURSION
-# Methods and blocks can be fully recursive:
+# 9. OPEN CLASSES & RECURSION
+# Any class (even built-ins) can be opened and extended with new methods:
 integer method factorial {
     [self <= 1] ifTrue {
         return 1
@@ -1035,7 +1326,7 @@ integer method factorial {
         return [self * [[self - 1] factorial]]
     }
 }
-"6! = [6 factorial]" println        # => 720
+"factorial(6) = [6 factorial]" println    # => 720
 
 # 10. COROUTINES (Stackless Protothreads in C / Channels in Go)
 # Cooperative multitasking with 2-way argument passing:
@@ -1067,6 +1358,78 @@ jsonObj at "version" put "1.0.0"
 @puts "Direct host print from @puts!"
 
 "=== Congratulations! You now know Tick! ===" println
+`,
+            oop: `# ======================================================================
+# Object-Oriented Programming (OOP) in Tick
+# Pure Smalltalk-80 semantics with clean Tcl command tokens
+# ======================================================================
+
+# 1. BASE CLASS DEFINITION & INSTANCE VARIABLES
+Object subclass Animal vars { name sound }
+
+Animal method init nameVal sound soundVal {
+    set name nameVal
+    set sound soundVal
+}
+
+# Encapsulation: instance variables are private to instances
+Animal method getName { return name }
+Animal method getSound { return sound }
+
+Animal method speak {
+    "$name says: $sound" println
+}
+
+# 2. INHERITANCE (Subclassing)
+# Dog inherits 'name' and 'sound', and adds 'breed'
+Animal subclass Dog vars { breed }
+
+Dog method initDog nameVal breed breedVal {
+    set name nameVal
+    set sound "Woof!"
+    set breed breedVal
+}
+
+Dog method getBreed { return breed }
+
+# Method overriding (Polymorphism)
+Dog method speak {
+    "$name the $breed barks: $sound" println
+}
+
+# Cat subclass
+Animal subclass Cat vars { lives }
+
+Cat method initCat nameVal {
+    set name nameVal
+    set sound "Meow!"
+    set lives 9
+}
+
+Cat method speak {
+    "$name purrs: $sound (lives: $lives)" println
+}
+
+# 3. INSTANTIATION & COMMA CASCADES
+# Comma cascades (,) send sequential messages to the newly created instance:
+set rover [Dog new , initDog "Rover" breed "Golden Retriever"]
+set luna  [Cat new , initCat "Luna"]
+
+# 4. POLYMORPHISM & DYNAMIC DISPATCH
+# Late-bound method resolution based on runtime receiver class:
+set pets [Array new , add rover , add luna]
+
+"=== Polymorphic Animal Sounds ===" println
+pets do { pet | pet speak }
+
+# 5. OPEN CLASSES (Monkey-patching built-ins)
+# Extend the core 'integer' class with a custom method:
+integer method square {
+    return [self * self]
+}
+
+"7 squared = [7 square]" println
+"Dog breed: [rover getBreed], Cat sound: [luna getSound]" println
 `,
             showcase: `# 1. Class & Method Definition
 Object subclass OrderProcessor vars { taxRate logger }
@@ -1207,8 +1570,8 @@ integer method fact {
     }
 }
 
-"7! = [7 fact]" println
-"10! = [10 fact]" println
+"fact(7) = [7 fact]" println
+"fact(10) = [10 fact]" println
 
 # Math methods on numbers
 "2^8: [2 pow 8]" println

@@ -17,10 +17,10 @@ integer method fact {
     }
 }
 set f5 [5 fact]
-@puts "5! = $f5"
+@puts "fact(5) = $f5"
 
 set f10 [10 fact]
-@puts "10! = $f10"
+@puts "fact(10) = $f10"
 
 @puts ""
 @puts "--- Testing Fluent Pipeline ---"
