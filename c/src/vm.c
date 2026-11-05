@@ -986,7 +986,46 @@ static Obj* m_num_gte(Obj* recv, int argc, Obj** argv, VM* vm) {
     return obj_new_bool(obj_to_float(recv) >= obj_to_float(argv[0]));
 }
 
+static Obj* m_arr_add(Obj* recv, int argc, Obj** argv, VM* vm);
+
 // Dict methods
+static Obj* m_dict_size(Obj* recv, int argc, Obj** argv, VM* vm) {
+    if (recv->type != OBJ_DICT) return obj_new_int(0);
+    return obj_new_int(recv->as.dict.count);
+}
+static Obj* m_dict_is_empty(Obj* recv, int argc, Obj** argv, VM* vm) {
+    if (recv->type != OBJ_DICT) return obj_new_bool(true);
+    return obj_new_bool(recv->as.dict.count == 0);
+}
+static Obj* m_dict_has_key(Obj* recv, int argc, Obj** argv, VM* vm) {
+    if (argc < 1 || recv->type != OBJ_DICT) return obj_new_bool(false);
+    char* key = obj_to_string(argv[0]);
+    for (int i = 0; i < recv->as.dict.count; i++) {
+        if (strcmp(recv->as.dict.entries[i].key, key) == 0) {
+            free(key);
+            return obj_new_bool(true);
+        }
+    }
+    free(key);
+    return obj_new_bool(false);
+}
+static Obj* m_dict_keys(Obj* recv, int argc, Obj** argv, VM* vm) {
+    Obj* arr = obj_new_array();
+    if (recv->type != OBJ_DICT) return arr;
+    for (int i = 0; i < recv->as.dict.count; i++) {
+        Obj* k = obj_new_string(recv->as.dict.entries[i].key);
+        m_arr_add(arr, 1, &k, vm);
+    }
+    return arr;
+}
+static Obj* m_dict_values(Obj* recv, int argc, Obj** argv, VM* vm) {
+    Obj* arr = obj_new_array();
+    if (recv->type != OBJ_DICT) return arr;
+    for (int i = 0; i < recv->as.dict.count; i++) {
+        m_arr_add(arr, 1, &recv->as.dict.entries[i].value, vm);
+    }
+    return arr;
+}
 static Obj* m_dict_at(Obj* recv, int argc, Obj** argv, VM* vm) {
     if (argc < 1 || recv->type != OBJ_DICT) return obj_new_nil();
     char* key = obj_to_string(argv[0]);
@@ -1144,6 +1183,40 @@ static Obj* m_arr_sort_by(Obj* recv, int argc, Obj** argv, VM* vm) {
             Obj* args[2] = { key, res->as.array.items[j] };
             VMResult r = vm_eval_block(vm, block, 2, args);
             if (obj_is_truthy(r.value)) {
+                res->as.array.items[j + 1] = res->as.array.items[j];
+                j--;
+            } else {
+                break;
+            }
+        }
+        res->as.array.items[j + 1] = key;
+    }
+    return res;
+}
+static Obj* m_arr_sorted(Obj* recv, int argc, Obj** argv, VM* vm) {
+    Obj* res = obj_new_array();
+    if (recv->type != OBJ_ARRAY) return res;
+    for (int i = 0; i < recv->as.array.count; i++) {
+        m_arr_add(res, 1, &recv->as.array.items[i], vm);
+    }
+    for (int i = 1; i < res->as.array.count; i++) {
+        Obj* key = res->as.array.items[i];
+        int j = i - 1;
+        while (j >= 0) {
+            bool smaller = false;
+            if (key->type == OBJ_INT && res->as.array.items[j]->type == OBJ_INT) {
+                smaller = key->as.integer < res->as.array.items[j]->as.integer;
+            } else if ((key->type == OBJ_INT || key->type == OBJ_FLOAT) &&
+                       (res->as.array.items[j]->type == OBJ_INT || res->as.array.items[j]->type == OBJ_FLOAT)) {
+                smaller = obj_to_float(key) < obj_to_float(res->as.array.items[j]);
+            } else {
+                char* sk = obj_to_string(key);
+                char* sj = obj_to_string(res->as.array.items[j]);
+                smaller = strcmp(sk, sj) < 0;
+                free(sk);
+                free(sj);
+            }
+            if (smaller) {
                 res->as.array.items[j + 1] = res->as.array.items[j];
                 j--;
             } else {
@@ -1492,6 +1565,7 @@ void vm_init_builtins(VM* vm) {
     class_add_native(ArrayClass, "collect:", m_arr_collect);
     class_add_native(ArrayClass, "inject:into:", m_arr_inject_into);
     class_add_native(ArrayClass, "sortBy:", m_arr_sort_by);
+    class_add_native(ArrayClass, "sorted", m_arr_sorted);
     class_add_native(ArrayClass, "do:", m_arr_do);
     class_add_native(ArrayClass, "join:", m_arr_join);
     class_add_native(ArrayClass, "contains:", m_arr_contains);
@@ -1500,8 +1574,14 @@ void vm_init_builtins(VM* vm) {
     class_add_native(ArrayClass, "reversed", m_arr_reverse);
 
     // Dictionary
+    class_add_native(DictClass, "size", m_dict_size);
+    class_add_native(DictClass, "count", m_dict_size);
+    class_add_native(DictClass, "isEmpty", m_dict_is_empty);
     class_add_native(DictClass, "at:", m_dict_at);
     class_add_native(DictClass, "at:put:", m_dict_at_put);
+    class_add_native(DictClass, "hasKey:", m_dict_has_key);
+    class_add_native(DictClass, "keys", m_dict_keys);
+    class_add_native(DictClass, "values", m_dict_values);
 
     // BlockClosure
     class_add_native(BlockClosureClass, "value", m_block_value);

@@ -1041,6 +1041,7 @@ integer method square {
             <p>Familiar Smalltalk semantics with a streamlined, modern command-token grammar.</p>
         </div>
 
+        <h3 style="font-family: var(--font-serif); font-size: 1.35rem; color: var(--ruby-text-title); margin-top: 30px; margin-bottom: 12px;">Core Syntax Reference</h3>
         <div class="table-wrapper">
             <table class="comparison-table">
                 <thead>
@@ -1108,6 +1109,237 @@ integer method square {
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Collections & Data Structures Subsection -->
+        <div class="section-header" style="margin-top: 50px;">
+            <h3>Collections & Data Structures</h3>
+            <p>First-class lists and dictionaries with pure Smalltalk message passing, fluent pipelines, and native JSON.</p>
+        </div>
+
+        <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--ruby-text-title); margin-top: 24px; margin-bottom: 10px;">1. Lists & Ordered Collections (<code>Array</code> / <code>List</code>)</h4>
+        <div class="table-wrapper">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Standard Smalltalk (Smalltalk-80 / Pharo)</th>
+                        <th>Tick</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Instantiation</strong></td>
+                        <td><code>list := OrderedCollection new.</code></td>
+                        <td><code>set list [List new]</code> <em>(or <code>Array new</code>)</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Append Item</strong></td>
+                        <td><code>list add: 42.</code></td>
+                        <td><code>list add 42</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cascade Appends</strong></td>
+                        <td><code>list add: 1; add: 2; add: 3; yourself.</code></td>
+                        <td><code>list add 1, add 2, add 3</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Access by Index</strong></td>
+                        <td><code>elem := list at: 1.</code> <em>(1-based)</em></td>
+                        <td><code>set elem [list at 1]</code> <em>(1-based or 0-based)</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mutate by Index</strong></td>
+                        <td><code>list at: 1 put: 99.</code></td>
+                        <td><code>list at 1 put 99</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>First / Last</strong></td>
+                        <td><code>list first. list last.</code></td>
+                        <td><code>list first</code> / <code>list last</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size / Length</strong></td>
+                        <td><code>list size.</code></td>
+                        <td><code>list size</code> <em>(or <code>count</code>, <code>length</code>)</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Check Empty</strong></td>
+                        <td><code>list isEmpty.</code></td>
+                        <td><code>list isEmpty</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Contains Item</strong></td>
+                        <td><code>list includes: 42.</code></td>
+                        <td><code>list contains 42</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Index of Item</strong></td>
+                        <td><code>list indexOf: 42.</code></td>
+                        <td><code>list indexOf 42</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Iteration (<code>do:</code>)</strong></td>
+                        <td><code>list do: [:x | Transcript show: x printString].</code></td>
+                        <td><code>list do { x | x println }</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Map / Transform</strong></td>
+                        <td><code>doubles := list collect: [:x | x * 2].</code></td>
+                        <td><code>set doubles [list collect { x | x * 2 }]</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Filter (Select)</strong></td>
+                        <td><code>evens := list select: [:x | x even].</code></td>
+                        <td><code>set evens [list select { x | [x % 2] == 0 }]</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Filter (Reject)</strong></td>
+                        <td><code>odds := list reject: [:x | x even].</code></td>
+                        <td><code>set odds [list reject { x | [x % 2] == 0 }]</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fold / Reduce</strong></td>
+                        <td><code>sum := list inject: 0 into: [:acc :x | acc + x].</code></td>
+                        <td><code>set sum [list inject 0 into { acc x | acc + x }]</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Custom Sort</strong></td>
+                        <td><code>sorted := list asSortedCollection: [:a :b | a &lt; b].</code></td>
+                        <td><code>set sorted [list sortBy { a b | [a &lt; b] }]</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Natural Sort</strong></td>
+                        <td><code>sorted := list asSortedCollection.</code></td>
+                        <td><code>set sorted [list sorted]</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reverse</strong></td>
+                        <td><code>list reversed.</code></td>
+                        <td><code>list reversed</code> <em>(or <code>reverse</code>)</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Slice / Sub-list</strong></td>
+                        <td><code>list copyFrom: 1 to: 3.</code></td>
+                        <td><code>list slice 0 to 3</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Join Strings</strong></td>
+                        <td><code>(list collect: #asString) joinSeparatedBy: ', '.</code></td>
+                        <td><code>list join ", "</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fluent Pipeline</strong></td>
+                        <td><code>((list select: [:x | x &gt; 10]) collect: [:x | x * 2]) sorted.</code></td>
+                        <td><code>list select { x | [x &gt; 10] } | collect { x | x * 2 } | sorted</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--ruby-text-title); margin-top: 36px; margin-bottom: 10px;">2. Dictionaries & Key-Value Maps (<code>Dictionary</code> / <code>dict</code>)</h4>
+        <div class="table-wrapper">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Standard Smalltalk (Smalltalk-80 / Pharo)</th>
+                        <th>Tick</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Instantiation</strong></td>
+                        <td><code>dict := Dictionary new.</code></td>
+                        <td><code>set dict [Dictionary new]</code> <em>(or <code>dict new</code>)</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Store Key-Value</strong></td>
+                        <td><code>dict at: 'name' put: 'Alice'.</code></td>
+                        <td><code>dict at "name" put "Alice"</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lookup Key</strong></td>
+                        <td><code>val := dict at: 'name'.</code></td>
+                        <td><code>set val [dict at "name"]</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cascade Inserts</strong></td>
+                        <td><code>dict at: 'a' put: 1; at: 'b' put: 2; yourself.</code></td>
+                        <td><code>dict at "a" put 1, at "b" put 2</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Check Key Exists</strong></td>
+                        <td><code>dict includesKey: 'name'.</code></td>
+                        <td><code>dict hasKey "name"</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>All Keys</strong></td>
+                        <td><code>dict keys.</code></td>
+                        <td><code>dict keys</code> <em>(returns Array)</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>All Values</strong></td>
+                        <td><code>dict values.</code></td>
+                        <td><code>dict values</code> <em>(returns Array)</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Size / Count</strong></td>
+                        <td><code>dict size.</code></td>
+                        <td><code>dict size</code> <em>(or <code>count</code>)</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Check Empty</strong></td>
+                        <td><code>dict isEmpty.</code></td>
+                        <td><code>dict isEmpty</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>JSON Export</strong></td>
+                        <td><em>(Requires external NeoJSON library)</em></td>
+                        <td><code>dict asJson</code> <em>(or <code>JSON stringify dict</code>)</em></td>
+                    </tr>
+                    <tr>
+                        <td><strong>JSON Import</strong></td>
+                        <td><em>(Requires external NeoJSON library)</em></td>
+                        <td><code>set dict [JSON parse '{"name": "Alice"}']</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="oop-card" style="margin-top: 36px;">
+            <div class="oop-card-header">
+                <h3>Real-World Data Pipeline in Tick</h3>
+                <span class="badge">Lists + Dictionaries + Pipelines</span>
+            </div>
+            <div class="oop-card-body">
+                <p>Tick pairs Smalltalk messaging with clean comma cascades and fluent pipelines for data manipulation:</p>
+                <div class="code-box">
+                    <div class="code-box-header"><span>student_pipeline.tick</span></div>
+                    <pre><code># 1. Populate records with cascading dictionaries
+set students [List new
+    , add [Dictionary new , at "name" put "Alice" , at "score" put 92 , at "active" put true]
+    , add [Dictionary new , at "name" put "Bob"   , at "score" put 65 , at "active" put true]
+    , add [Dictionary new , at "name" put "Carol" , at "score" put 88 , at "active" put false]
+    , add [Dictionary new , at "name" put "Dave"  , at "score" put 95 , at "active" put true]
+]
+
+# 2. Pipeline: filter active students scoring &gt;= 80, map to names, and sort
+set honorRoll [
+    students select { s | [s at "active"] &amp; [[s at "score"] &gt;= 80] }
+    | collect { s | s at "name" }
+    | sorted
+]
+
+set names [honorRoll join ", "]
+"Honor Roll: $names" println
+# =&gt; Honor Roll: Alice, Dave
+
+# 3. Native JSON serialization
+set jsonOutput [students asJson]
+"Exported JSON: $jsonOutput" println</code></pre>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -1548,17 +1780,33 @@ set worker [
 "Worker final status: [worker status]" println
 "Worker is done: [worker isDone]" println
 `,
-            json: `# JSON Serialization and Rich Types
-set payload "{\\"language\\":\\"Tick\\",\\"version\\":1,\\"fast\\":true,\\"tags\\":[\\"oop\\",\\"tcl\\",\\"wasm\\"]}"
-set data [JSON parse payload]
+            json: `# Collections (Lists & Dictionaries) + JSON Pipeline
+set students [List new
+    , add [Dictionary new , at "name" put "Alice" , at "score" put 92 , at "active" put true]
+    , add [Dictionary new , at "name" put "Bob"   , at "score" put 65 , at "active" put true]
+    , add [Dictionary new , at "name" put "Carol" , at "score" put 88 , at "active" put false]
+    , add [Dictionary new , at "name" put "Dave"  , at "score" put 95 , at "active" put true]
+]
 
-"Parsed Language: [data at 'language']" println
-"Parsed Version:  [data at 'version']" println
-"Parsed Tags:     [data at 'tags' | join ' • ']" println
+# Pipeline: select active with score >= 80, map to names, sort
+set honorRoll [
+    students select { s | [s at "active"] & [[s at "score"] >= 80] }
+    | collect { s | s at "name" }
+    | sorted
+]
 
-# Mutate and serialize back
-data at "status" put "WebAssembly Live"
-"Serialized: [JSON stringify data]" println
+set names [honorRoll join ", "]
+"Honor Roll: $names" println
+
+# Inspect Dictionary keys & membership
+set firstStudent [students first]
+set keysStr [firstStudent keys | join ", "]
+"First student keys: $keysStr" println
+set hasScore [firstStudent hasKey "score"]
+"Has score? $hasScore" println
+
+# Native JSON Serialization
+"Serialized JSON: [students asJson]" println
 `,
             recursion: `# Recursive Factorial & Math
 integer method fact {

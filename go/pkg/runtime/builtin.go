@@ -605,6 +605,18 @@ func InitBuiltinMethods(vm *VM) {
 	})
 
 	// ================= Dictionary =================
+	DictClass.AddNativeMethod("size", func(recv Value, args []Value, v *VM) (Value, error) {
+		dict := recv.(*DictVal)
+		return IntVal{Val: int64(len(dict.Entries))}, nil
+	})
+	DictClass.AddNativeMethod("count", func(recv Value, args []Value, v *VM) (Value, error) {
+		dict := recv.(*DictVal)
+		return IntVal{Val: int64(len(dict.Entries))}, nil
+	})
+	DictClass.AddNativeMethod("isEmpty", func(recv Value, args []Value, v *VM) (Value, error) {
+		dict := recv.(*DictVal)
+		return BoolVal{Val: len(dict.Entries) == 0}, nil
+	})
 	DictClass.AddNativeMethod("at:", func(recv Value, args []Value, v *VM) (Value, error) {
 		if err := CheckArgCount("at:", args, 1); err != nil {
 			return nil, err

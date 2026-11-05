@@ -154,6 +154,82 @@ integer method square {
 | **Fluent Pipeline** | `((items select: [:x \| x valid]) collect: [:x \| x name]) sorted.` | `items select { x \| x valid } \| collect { x \| x name } \| sorted` |
 | **Message Cascade** | `pen up; color: "blue"; down.` | `pen up, color "blue", down` |
 
+### Collections & Data Structures (Smalltalk vs. Tick)
+
+Tick preserves Smalltalk's pure object-oriented message passing for collections while modernizing ergonomics:
+- **No clumsy semicolons or `yourself`**: Comma cascades (`,`) naturally chain mutations on receivers without boilerplate.
+- **No nested parentheses for functional transforms**: Fluent pipelines (`|`) channel data effortlessly through `select`, `reject`, `collect`, `inject:into:`, and `sortBy:`.
+- **First-class JSON**: Native `asJson`, `JSON parse`, and `JSON stringify` eliminate reliance on external libraries like NeoJSON.
+
+#### 1. Lists & Ordered Collections (`Array` / `List`)
+
+| Collection Operation | Standard Smalltalk (Smalltalk-80 / Pharo) | Tick |
+| :--- | :--- | :--- |
+| **Instantiation** | `list := OrderedCollection new.` | `set list [List new]` *(or `Array new`)* |
+| **Append Item** | `list add: 42.` | `list add 42` |
+| **Cascade Appends** | `list add: 1; add: 2; add: 3; yourself.` | `list add 1, add 2, add 3` |
+| **Access by Index** | `elem := list at: 1.` *(1-based)* | `set elem [list at 1]` *(1-based or 0-based)* |
+| **Mutate by Index** | `list at: 1 put: 99.` | `list at 1 put 99` |
+| **First / Last** | `list first. list last.` | `list first` / `list last` |
+| **Size / Length** | `list size.` | `list size` *(or `count`, `length`)* |
+| **Check Empty** | `list isEmpty.` | `list isEmpty` |
+| **Contains Item** | `list includes: 42.` | `list contains 42` |
+| **Index of Item** | `list indexOf: 42.` | `list indexOf 42` |
+| **Iteration (`do:`)** | `list do: [:x \| Transcript show: x printString].` | `list do { x \| x println }` |
+| **Map / Transform** | `doubles := list collect: [:x \| x * 2].` | `set doubles [list collect { x \| x * 2 }]` |
+| **Filter (Select)** | `evens := list select: [:x \| x even].` | `set evens [list select { x \| [x % 2] == 0 }]` |
+| **Filter (Reject)** | `odds := list reject: [:x \| x even].` | `set odds [list reject { x \| [x % 2] == 0 }]` |
+| **Fold / Reduce** | `sum := list inject: 0 into: [:acc :x \| acc + x].` | `set sum [list inject 0 into { acc x \| acc + x }]` |
+| **Custom Sort** | `sorted := list asSortedCollection: [:a :b \| a < b].` | `set sorted [list sortBy { a b \| a < b }]` |
+| **Natural Sort** | `sorted := list asSortedCollection.` | `set sorted [list sorted]` |
+| **Reverse** | `list reversed.` | `list reversed` *(or `reverse`)* |
+| **Slice / Sub-list** | `list copyFrom: 1 to: 3.` | `list slice 0 to 3` |
+| **Join into String** | `(list collect: #asString) joinSeparatedBy: ', '.` | `list join ", "` |
+| **Fluent Pipeline** | `((list select: [:x \| x > 10]) collect: [:x \| x * 2]) sorted.` | `list select { x \| x > 10 } \| collect { x \| x * 2 } \| sorted` |
+
+#### 2. Dictionaries & Key-Value Maps (`Dictionary` / `dict`)
+
+| Dictionary Operation | Standard Smalltalk (Smalltalk-80 / Pharo) | Tick |
+| :--- | :--- | :--- |
+| **Instantiation** | `dict := Dictionary new.` | `set dict [Dictionary new]` *(or `dict new`)* |
+| **Store Key-Value** | `dict at: 'name' put: 'Alice'.` | `dict at "name" put "Alice"` |
+| **Lookup Key** | `val := dict at: 'name'.` | `set val [dict at "name"]` |
+| **Cascade Inserts** | `dict at: 'a' put: 1; at: 'b' put: 2; yourself.` | `dict at "a" put 1, at "b" put 2` |
+| **Check Key Exists**| `dict includesKey: 'name'.` | `dict hasKey "name"` |
+| **All Keys** | `dict keys.` | `dict keys` *(returns Array)* |
+| **All Values** | `dict values.` | `dict values` *(returns Array)* |
+| **Size / Count** | `dict size.` | `dict size` *(or `count`)* |
+| **Check Empty** | `dict isEmpty.` | `dict isEmpty` |
+| **JSON Export** | *(Requires external NeoJSON library)* | `dict asJson` *(or `JSON stringify dict`)* |
+| **JSON Import** | *(Requires external NeoJSON library)* | `set dict [JSON parse '{"name": "Alice"}']` |
+
+#### 3. Real-World Data Pipeline Example
+
+```tcl
+# Create a list of student records using cascading dictionaries
+set students [List new
+    , add [Dictionary new , at "name" put "Alice" , at "score" put 92 , at "active" put true]
+    , add [Dictionary new , at "name" put "Bob"   , at "score" put 65 , at "active" put true]
+    , add [Dictionary new , at "name" put "Carol" , at "score" put 88 , at "active" put false]
+    , add [Dictionary new , at "name" put "Dave"  , at "score" put 95 , at "active" put true]
+]
+
+# Pipeline: filter active students scoring >= 80, map to names, and sort alphabetically
+set honorRoll [
+    students select { s | [s at "active"] & [[s at "score"] >= 80] }
+    | collect { s | s at "name" }
+    | sorted
+]
+
+set names [honorRoll join ", "]
+"Honor Roll: $names" println
+# => Honor Roll: Alice, Dave
+
+# Native JSON Serialization
+set jsonOutput [students asJson]
+"Exported JSON: $jsonOutput" println
+```
+
 ---
 
 ## Complete Language Showcase
