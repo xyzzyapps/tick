@@ -5,6 +5,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"sync"
 	"syscall/js"
 
@@ -32,20 +33,86 @@ func initVM() {
 	ffiEngine = ffi.NewEngine()
 	ffiEngine.Output = &outBuf
 
-	// Custom Web FFI functions
+	// Custom Web FFI functions (Browser DOM, Console, Dialogs)
 	defaultHandler := ffiEngine.HandleFFI
 	vm.FFIHandler = func(name string, args []runtime.Value, v *runtime.VM) (runtime.Value, error) {
-		switch name {
+		fnName := strings.TrimPrefix(name, "@")
+		switch fnName {
 		case "alert":
+			msg := ""
 			if len(args) > 0 {
-				js.Global().Call("alert", args[0].String())
+				msg = args[0].String()
+			}
+			js.Global().Call("alert", msg)
+			outBuf.WriteString(fmt.Sprintf("[alert] %s\n", msg))
+			return runtime.NilVal{}, nil
+
+		case "log", "console:log":
+			msg := ""
+			if len(args) > 0 {
+				msg = args[0].String()
+			}
+			js.Global().Get("console").Call("log", msg)
+			outBuf.WriteString(fmt.Sprintf("[console.log] %s\n", msg))
+			return runtime.NilVal{}, nil
+
+		case "warn", "console:warn":
+			msg := ""
+			if len(args) > 0 {
+				msg = args[0].String()
+			}
+			js.Global().Get("console").Call("warn", msg)
+			outBuf.WriteString(fmt.Sprintf("[console.warn] %s\n", msg))
+			return runtime.NilVal{}, nil
+
+		case "error", "console:error":
+			msg := ""
+			if len(args) > 0 {
+				msg = args[0].String()
+			}
+			js.Global().Get("console").Call("error", msg)
+			outBuf.WriteString(fmt.Sprintf("[console.error] %s\n", msg))
+			return runtime.NilVal{}, nil
+
+		case "prompt":
+			msg := ""
+			defVal := ""
+			if len(args) > 0 {
+				msg = args[0].String()
+			}
+			if len(args) > 1 {
+				defVal = args[1].String()
+			}
+			res := js.Global().Call("prompt", msg, defVal)
+			if res.IsNull() || res.IsUndefined() {
+				return runtime.NilVal{}, nil
+			}
+			return runtime.StringVal{Val: res.String()}, nil
+
+		case "confirm":
+			msg := ""
+			if len(args) > 0 {
+				msg = args[0].String()
+			}
+			res := js.Global().Call("confirm", msg)
+			return runtime.BoolVal{Val: res.Bool()}, nil
+
+		case "title":
+			if len(args) > 0 {
+				js.Global().Get("document").Set("title", args[0].String())
+			}
+			return runtime.StringVal{Val: js.Global().Get("document").Get("title").String()}, nil
+
+		case "eval", "js:eval":
+			if len(args) > 0 {
+				res := js.Global().Call("eval", args[0].String())
+				if res.IsNull() || res.IsUndefined() {
+					return runtime.NilVal{}, nil
+				}
+				return runtime.StringVal{Val: res.String()}, nil
 			}
 			return runtime.NilVal{}, nil
-		case "log":
-			if len(args) > 0 {
-				js.Global().Get("console").Call("log", args[0].String())
-			}
-			return runtime.NilVal{}, nil
+
 		default:
 			return defaultHandler(name, args, v)
 		}
@@ -135,8 +202,10 @@ func main() {
 	js.Global().Set("tickVersion", js.FuncOf(tickVersion))
 	js.Global().Set("tickReady", true)
 
-	// Notify window that Tick WASM runtime is loaded and ready
-	js.Global().Call("dispatchEvent", js.Global().Get("CustomEvent").New("tick-ready"))
+	// Notify window that Tick WASM runtime is loaded and ready if dispatchEvent is available
+	if js.Global().Get("dispatchEvent").Type() == js.TypeFunction && js.Global().Get("CustomEvent").Type() == js.TypeFunction {
+		js.Global().Call("dispatchEvent", js.Global().Get("CustomEvent").New("tick-ready"))
+	}
 
 	// Keep the Go runtime alive
 	select {}

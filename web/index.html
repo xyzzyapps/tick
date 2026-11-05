@@ -1577,14 +1577,22 @@ integer method fact {
 "min(15, 42): [15 min 42]" println
 "max(15, 42): [15 max 42]" println
 `,
-            web: `# Tick Web FFI: Calling the Browser Environment
-@log "Hello from Tick running in WebAssembly!"
+            web: `# Tick Web FFI: Direct Browser Interop in WebAssembly
 
+# 1. Console Logging (inspect your F12 developer console!)
+@log "Hello from Tick running inside WebAssembly!"
+@warn "This is a browser console warning from Tick"
+
+# 2. Printing to the web terminal with string interpolation
 set name "Web Developer"
 "Welcome to Tick WASM, $name!" println
 
-# Pop up an alert dialog
-@alert "Tick is running inside your browser via WebAssembly!"
+# 3. Executing JavaScript directly via @eval:
+set jsMath [@eval "Math.round(Math.PI * 100) / 100"]
+"JavaScript Math evaluated: $jsMath" println
+
+# 4. Interactive Browser Dialog:
+@alert "🎉 Success! @alert, @log, and @eval are running live via Web FFI!"
 `
         };
 
