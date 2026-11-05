@@ -1,7 +1,5 @@
 # Tick
 
-> 🤖 **Built with Gemini** — Designed and implemented with Google Gemini.
-
 🌐 **[Interactive WebAssembly Playground](https://xyzzyapps.github.io/tick/)** &bull; 📦 **[Download Precompiled Binaries (v1.0)](https://github.com/xyzzyapps/tick/releases/tag/v1.0)**
 
 **Tick** is a strict, zero-filler synthesis of Smalltalk’s pure object-oriented message passing and Tcl’s command-token structure, designed as an embeddable, featherweight scripting language for rapid prototyping (akin to Lua, Tcl, or Lisp). Every word in a statement is a receiver, a selector keyword, or an argument—with zero decorative prepositions or redundant punctuation.
