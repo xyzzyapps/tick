@@ -767,6 +767,7 @@
                 <li><a href="#features">Features</a></li>
                 <li><a href="#oo-principles">OOP Principles</a></li>
                 <li><a href="#comparison">Smalltalk vs Tick</a></li>
+                <li><a href="https://github.com/xyzzyapps/tick/releases/tag/v1.0" target="_blank">Downloads (v1.0) ↗</a></li>
                 <li><a href="https://github.com/xyzzyapps/tick" target="_blank">GitHub ↗</a></li>
                 <li><span id="wasm-status" class="nav-badge">⚡ Loading WASM...</span></li>
             </ul>
@@ -785,6 +786,7 @@
             </p>
             <div class="hero-actions">
                 <a href="#playground" class="btn btn-ruby">▶ Try Tick in Your Browser</a>
+                <a href="https://github.com/xyzzyapps/tick/releases/tag/v1.0" target="_blank" class="btn btn-secondary">📦 Download Binaries (v1.0)</a>
                 <a href="https://github.com/xyzzyapps/tick" target="_blank" class="btn btn-secondary">🐙 View on GitHub</a>
             </div>
         </div>
@@ -858,7 +860,7 @@
     <section id="features" class="features-section">
         <div class="features-inner">
             <div class="section-header">
-                <h2>Why Developers Love Tick</h2>
+                <h2>Why Developers will Love Tick</h2>
                 <p>Designed as an embeddable, featherweight scripting language for rapid prototyping.</p>
             </div>
 
@@ -950,7 +952,7 @@
                         <div class="oo-pillar-content">
                             <h4>3. Encapsulation & Clean Assignment</h4>
                             <p>
-                                Instance variables are private to each instance and protected from external access. All state mutation uses the clean keyword <code>set</code> (e.g. <code>set balance [balance + amount]</code>)—never punctuation sigils or exclamation marks.
+                                Instance variables are private to each instance and protected from external access. All state mutation uses the clean keyword <code>set</code> (e.g. <code>set balance [balance + amount]</code>). All external interactions are mediated through messages.
                             </p>
                         </div>
                     </div>
@@ -1027,9 +1029,6 @@ integer method square {
     return [self * self]
 }
 "5 squared = [5 square]" println  # => 25</code></pre>
-                    <div class="oo-note-box">
-                        <strong>Guaranteed Syntax:</strong> Tick strictly uses the readable keyword <code>set</code> for all assignments (<code>set var value</code>). The exclamation mark (<code>!</code>) is never used for assignment.
-                    </div>
                 </div>
             </div>
         </div>
@@ -1125,6 +1124,7 @@ integer method square {
                 <h4>Resources</h4>
                 <ul>
                     <li><a href="https://github.com/xyzzyapps/tick" target="_blank">GitHub Repository</a></li>
+                    <li><a href="https://github.com/xyzzyapps/tick/releases/tag/v1.0" target="_blank">Download v1.0 Binaries</a></li>
                     <li><a href="#playground">WebAssembly Playground</a></li>
                     <li><a href="https://github.com/xyzzyapps/tick/blob/main/README.md" target="_blank">Documentation & README</a></li>
                     <li><a href="https://github.com/xyzzyapps/tick/tree/main/examples" target="_blank">Example Suites (.tick)</a></li>
@@ -1244,8 +1244,7 @@ set items [buffer join ", "]
 
 # 8. PURE OBJECT-ORIENTED PROGRAMMING (Smalltalk-80 Heritage)
 # Everything in Tick is an object.
-# Assignment is ALWAYS the keyword 'set' (e.g. 'set var value' or 'set ivar value').
-# No exclamation mark (!) is used for assignment.
+# Assignment uses the keyword 'set' (e.g. 'set var value' or 'set ivar value').
 
 # Base class definition with instance variables:
 Object subclass Shape vars { name }

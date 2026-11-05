@@ -89,8 +89,7 @@ set items [buffer join ", "]
 
 # 8. PURE OBJECT-ORIENTED PROGRAMMING (Smalltalk-80 Heritage)
 # Everything in Tick is an object.
-# Assignment is ALWAYS the keyword 'set' (e.g. 'set var value' or 'set ivar value').
-# No exclamation mark (!) is used for assignment.
+# Assignment uses the keyword 'set' (e.g. 'set var value' or 'set ivar value').
 
 # Base class definition with instance variables:
 Object subclass Shape vars { name }
