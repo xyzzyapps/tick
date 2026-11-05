@@ -14,3 +14,6 @@ Thumbs.db
 
 # Keep web wasm
 !web/tick.wasm
+
+# Distribution builds
+dist/
