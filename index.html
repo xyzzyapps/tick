@@ -607,6 +607,16 @@
             white-space: pre;
         }
 
+        /* Syntax Highlighting Tokens */
+        .syn-comment { color: #8e8896; font-style: italic; }
+        .syn-keyword { color: #f43f5e; font-weight: 600; }
+        .syn-class   { color: #38bdf8; font-weight: 600; }
+        .syn-method  { color: #c084fc; font-weight: 500; }
+        .syn-string  { color: #34d399; }
+        .syn-number  { color: #fbbf24; }
+        .syn-op      { color: #f97316; font-weight: bold; }
+        .syn-var     { color: #f472b6; }
+
         .oo-note-box {
             margin-top: 24px;
             background-color: #fff1f2;
@@ -994,41 +1004,41 @@
                         <span>oop_architecture.tick</span>
                         <span>Smalltalk-80 Semantics</span>
                     </div>
-                    <pre class="oo-code-body"><code># 1. Base Class with Instance Variables
-Object subclass Animal vars { name sound }
+                    <pre class="oo-code-body"><code><span class="syn-comment"># 1. Base Class with Instance Variables</span>
+<span class="syn-class">Object</span> <span class="syn-method">subclass</span> <span class="syn-class">Animal</span> <span class="syn-method">vars</span> { name sound }
 
-Animal method init nameVal sound soundVal {
-    set name nameVal
-    set sound soundVal
+<span class="syn-class">Animal</span> <span class="syn-keyword">method</span> <span class="syn-method">init</span> nameVal sound soundVal {
+    <span class="syn-keyword">set</span> name nameVal
+    <span class="syn-keyword">set</span> sound soundVal
 }
 
-Animal method getName { return name }
-Animal method speak {
-    "$name says: $sound" println
+<span class="syn-class">Animal</span> <span class="syn-keyword">method</span> <span class="syn-method">getName</span> { <span class="syn-keyword">return</span> name }
+<span class="syn-class">Animal</span> <span class="syn-keyword">method</span> <span class="syn-method">speak</span> {
+    <span class="syn-string">"$name says: $sound"</span> <span class="syn-method">println</span>
 }
 
-# 2. Subclassing & Method Overriding (Inheritance)
-Animal subclass Dog vars { breed }
+<span class="syn-comment"># 2. Subclassing &amp; Method Overriding (Inheritance)</span>
+<span class="syn-class">Animal</span> <span class="syn-method">subclass</span> <span class="syn-class">Dog</span> <span class="syn-method">vars</span> { breed }
 
-Dog method initDog nameVal breed breedVal {
-    set name nameVal
-    set sound "Woof!"
-    set breed breedVal
+<span class="syn-class">Dog</span> <span class="syn-keyword">method</span> <span class="syn-method">initDog</span> nameVal breed breedVal {
+    <span class="syn-keyword">set</span> name nameVal
+    <span class="syn-keyword">set</span> sound <span class="syn-string">"Woof!"</span>
+    <span class="syn-keyword">set</span> breed breedVal
 }
 
-Dog method speak {
-    "$name the $breed barks: $sound" println
+<span class="syn-class">Dog</span> <span class="syn-keyword">method</span> <span class="syn-method">speak</span> {
+    <span class="syn-string">"$name the $breed barks: $sound"</span> <span class="syn-method">println</span>
 }
 
-# 3. Cascading Instantiation & Polymorphism
-set dog [Dog new , initDog "Rover" breed "Collie"]
-dog speak    # => Rover the Collie barks: Woof!
+<span class="syn-comment"># 3. Cascading Instantiation &amp; Polymorphism</span>
+<span class="syn-keyword">set</span> dog [<span class="syn-class">Dog</span> <span class="syn-method">new</span> <span class="syn-op">,</span> <span class="syn-method">initDog</span> <span class="syn-string">"Rover"</span> <span class="syn-method">breed</span> <span class="syn-string">"Collie"</span>]
+dog <span class="syn-method">speak</span>    <span class="syn-comment"># =&gt; Rover the Collie barks: Woof!</span>
 
-# 4. Open Classes (Extend built-ins)
-integer method square {
-    return [self * self]
+<span class="syn-comment"># 4. Open Classes (Extend built-ins)</span>
+<span class="syn-class">integer</span> <span class="syn-keyword">method</span> <span class="syn-method">square</span> {
+    <span class="syn-keyword">return</span> [self * self]
 }
-"5 squared = [5 square]" println  # => 25</code></pre>
+<span class="syn-string">"5 squared = [5 square]"</span> <span class="syn-method">println</span>  <span class="syn-comment"># =&gt; 25</span></code></pre>
                 </div>
             </div>
         </div>
@@ -1307,38 +1317,77 @@ integer method square {
             </table>
         </div>
 
-        <div class="oop-card" style="margin-top: 36px;">
-            <div class="oop-card-header">
+        <!-- Real-World Data Pipeline -->
+        <div style="margin-top: 50px;">
+            <div class="section-header" style="margin-bottom: 20px;">
                 <h3>Real-World Data Pipeline in Tick</h3>
-                <span class="badge">Lists + Dictionaries + Pipelines</span>
+                <p>Composing lists, cascading dictionaries, and fluent pipelines with zero ceremony.</p>
             </div>
-            <div class="oop-card-body">
-                <p>Tick pairs Smalltalk messaging with clean comma cascades and fluent pipelines for data manipulation:</p>
-                <div class="code-box">
-                    <div class="code-box-header"><span>student_pipeline.tick</span></div>
-                    <pre><code># 1. Populate records with cascading dictionaries
-set students [List new
-    , add [Dictionary new , at "name" put "Alice" , at "score" put 92 , at "active" put true]
-    , add [Dictionary new , at "name" put "Bob"   , at "score" put 65 , at "active" put true]
-    , add [Dictionary new , at "name" put "Carol" , at "score" put 88 , at "active" put false]
-    , add [Dictionary new , at "name" put "Dave"  , at "score" put 95 , at "active" put true]
-]
 
-# 2. Pipeline: filter active students scoring &gt;= 80, map to names, and sort
-set honorRoll [
-    students select { s | [s at "active"] &amp; [[s at "score"] &gt;= 80] }
-    | collect { s | s at "name" }
-    | sorted
-]
-
-set names [honorRoll join ", "]
-"Honor Roll: $names" println
-# =&gt; Honor Roll: Alice, Dave
-
-# 3. Native JSON serialization
-set jsonOutput [students asJson]
-"Exported JSON: $jsonOutput" println</code></pre>
+            <div class="oo-code-card">
+                <div class="oo-code-header">
+                    <span>student_pipeline.tick</span>
+                    <span>Lists + Dictionaries + Pipelines</span>
                 </div>
+                <pre class="oo-code-body"><code><span class="syn-comment"># 1. Populate records with cascading dictionaries</span>
+<span class="syn-keyword">set</span> students [
+    <span class="syn-class">List</span> <span class="syn-method">new</span>
+    <span class="syn-op">,</span> <span class="syn-method">add</span> [<span class="syn-class">Dictionary</span> <span class="syn-method">new</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"name"</span> <span class="syn-method">put</span> <span class="syn-string">"Alice"</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"score"</span> <span class="syn-method">put</span> <span class="syn-number">92</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"active"</span> <span class="syn-method">put</span> <span class="syn-keyword">true</span>]
+    <span class="syn-op">,</span> <span class="syn-method">add</span> [<span class="syn-class">Dictionary</span> <span class="syn-method">new</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"name"</span> <span class="syn-method">put</span> <span class="syn-string">"Bob"</span>   <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"score"</span> <span class="syn-method">put</span> <span class="syn-number">65</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"active"</span> <span class="syn-method">put</span> <span class="syn-keyword">true</span>]
+    <span class="syn-op">,</span> <span class="syn-method">add</span> [<span class="syn-class">Dictionary</span> <span class="syn-method">new</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"name"</span> <span class="syn-method">put</span> <span class="syn-string">"Carol"</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"score"</span> <span class="syn-method">put</span> <span class="syn-number">88</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"active"</span> <span class="syn-method">put</span> <span class="syn-keyword">false</span>]
+    <span class="syn-op">,</span> <span class="syn-method">add</span> [<span class="syn-class">Dictionary</span> <span class="syn-method">new</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"name"</span> <span class="syn-method">put</span> <span class="syn-string">"Dave"</span>  <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"score"</span> <span class="syn-method">put</span> <span class="syn-number">95</span> <span class="syn-op">,</span> <span class="syn-method">at</span> <span class="syn-string">"active"</span> <span class="syn-method">put</span> <span class="syn-keyword">true</span>]
+]
+
+<span class="syn-comment"># 2. Pipeline: filter active students scoring &gt;= 80, map to names, and sort</span>
+<span class="syn-keyword">set</span> honorRoll [
+    students <span class="syn-method">select</span> { s | [s <span class="syn-method">at</span> <span class="syn-string">"active"</span>] &amp; [[s <span class="syn-method">at</span> <span class="syn-string">"score"</span>] &gt;= <span class="syn-number">80</span>] }
+    <span class="syn-op">|</span> <span class="syn-method">collect</span> { s | s <span class="syn-method">at</span> <span class="syn-string">"name"</span> }
+    <span class="syn-op">|</span> <span class="syn-method">sorted</span>
+]
+
+<span class="syn-keyword">set</span> names [honorRoll <span class="syn-method">join</span> <span class="syn-string">", "</span>]
+<span class="syn-string">"Honor Roll: $names"</span> <span class="syn-method">println</span>
+<span class="syn-comment"># =&gt; Honor Roll: Alice, Dave</span>
+
+<span class="syn-comment"># 3. Native JSON serialization</span>
+<span class="syn-keyword">set</span> jsonOutput [students <span class="syn-method">asJson</span>]
+<span class="syn-string">"Exported JSON: $jsonOutput"</span> <span class="syn-method">println</span></code></pre>
+            </div>
+        </div>
+
+        <!-- Error Handling -->
+        <div style="margin-top: 50px;">
+            <div class="section-header" style="margin-bottom: 20px;">
+                <h3>Error Handling: Errors as Values</h3>
+                <p>No hidden exceptions, stack unwinding, or invisible control jumps. Predictable and fast.</p>
+            </div>
+
+            <div class="oo-code-card">
+                <div class="oo-code-header">
+                    <span>error_patterns.tick</span>
+                    <span>Tuples • Blocks • Result Types</span>
+                </div>
+                <pre class="oo-code-body"><code><span class="syn-comment"># 1. Go-style [value, err] tuples</span>
+<span class="syn-class">File</span> <span class="syn-keyword">method</span> <span class="syn-method">read</span> path {
+    [path == <span class="syn-string">"missing.txt"</span>] <span class="syn-method">ifTrue</span> {
+        <span class="syn-keyword">return</span> [<span class="syn-class">List</span> <span class="syn-method">new</span> <span class="syn-op">,</span> <span class="syn-method">add</span> <span class="syn-keyword">nil</span> <span class="syn-op">,</span> <span class="syn-method">add</span> <span class="syn-string">"file not found"</span>]
+    }
+    <span class="syn-keyword">return</span> [<span class="syn-class">List</span> <span class="syn-method">new</span> <span class="syn-op">,</span> <span class="syn-method">add</span> <span class="syn-string">"file data"</span> <span class="syn-op">,</span> <span class="syn-method">add</span> <span class="syn-keyword">nil</span>]
+}
+<span class="syn-keyword">set</span> outcome [<span class="syn-class">File</span> <span class="syn-method">read</span> <span class="syn-string">"missing.txt"</span>]
+<span class="syn-keyword">set</span> err [outcome <span class="syn-method">at</span> <span class="syn-number">2</span>]
+[err <span class="syn-method">notNil</span>] <span class="syn-method">ifTrue</span> { <span class="syn-string">"Error: $err"</span> <span class="syn-method">println</span> }
+
+<span class="syn-comment"># 2. Smalltalk-style fallback blocks</span>
+<span class="syn-class">Service</span> <span class="syn-keyword">method</span> <span class="syn-method">query</span> id <span class="syn-method">onError</span> errBlock {
+    [id &lt;= <span class="syn-number">0</span>] <span class="syn-method">ifTrue</span> { <span class="syn-keyword">return</span> [errBlock <span class="syn-method">value</span> <span class="syn-string">"invalid ID"</span>] }
+    <span class="syn-keyword">return</span> <span class="syn-string">"Record-$id"</span>
+}
+<span class="syn-keyword">set</span> record [<span class="syn-class">Service</span> <span class="syn-method">query</span> -<span class="syn-number">1</span> <span class="syn-method">onError</span> { e | <span class="syn-keyword">return</span> <span class="syn-string">"default-user"</span> }]
+
+<span class="syn-comment"># 3. Userland Result class (isOk, unwrap, error)</span>
+<span class="syn-keyword">set</span> result [<span class="syn-class">Math</span> <span class="syn-method">safeDivide</span> <span class="syn-number">10</span> <span class="syn-method">by</span> <span class="syn-number">0</span>]
+[result <span class="syn-method">isOk</span>] <span class="syn-method">ifFalse</span> { <span class="syn-string">"Failed: [result error]"</span> <span class="syn-method">println</span> }</code></pre>
             </div>
         </div>
     </section>
